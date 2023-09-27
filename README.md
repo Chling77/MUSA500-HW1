@@ -1,0 +1,2 @@
+# MUSA500-HW1
+Homework 1: Using OLS Regression to Predict Median House Values in Philadelphia
