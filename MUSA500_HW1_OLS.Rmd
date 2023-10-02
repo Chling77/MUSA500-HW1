@@ -1,0 +1,144 @@
+---
+title: "MUSA500 Homework 1: Using OLS Regression to Predict Median House Values in Philadelphia"
+author: "Ling Chen,Hang zhao, Jiahang Li"
+date: "2023-10-01"
+output: html_document:
+    theme: readable
+    toc: true
+    toc_float: true
+    code_folding: "hide"
+    code_download: false
+    theme: united
+    highlight: espresso
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+  message = FALSE,
+	warning = FALSE)
+```
+
+
+```{r setup, include=FALSE, echo=FALSE, message=FALSE, warning=FALSE}
+knitr::opts_chunk$set()
+
+library(tidyr)
+library(dplyr)
+library(DAAG)
+library(car)  #to calculate VIF
+library(MASS)
+library(rsq)
+library(kableExtra)
+library(tidyverse) #for ggplot
+library(sf) #for maps
+library(cowplot) #for plotgrid
+library(classInt)#for jenks breaks
+library(rgdal)
+library(ggplot2)
+library(RColorBrewer)
+library(broom)
+library(r2symbols)
+
+options(scipen=999)
+
+data <- read.csv("https://raw.githubusercontent.com/Chling77/MUSA500-HW1/main/Data/RegressionData.csv")
+data_geom <-st_read("D:/00Penn-学习/MUSA500/HW 1/RegressionData_geom/RegressionData.shp")
+
+```
+
+# **Introduction**
+
+xxxxxxx
+
+# **Methods**
+
+## **a. Data Cleaning**
+
+xxxxxxxxxxxxx
+
+## **b. Exploratory Analysis**
+
+xxxxxxxxxx
+
+## **c. Multiple Regression Analysis**
+
+xxxxxxxxxxxxxx
+
+## **d. Additional Analysis**
+
+xxxxxxxx
+
+# **Results**
+
+```{r plot}
+library(lattice)
+# plot all the histograms
+hist(data$MEDHVAL)
+hist(data$NBELPOV100)
+hist(data$PCTBACHMOR)
+hist(data$PCTVACANT)
+hist(data$PCTSINGLES)
+
+hists <- histogram( ~ MEDHVAL +PCTBACHMOR +PCTVACANT +PCTSINGLES  +NBELPOV100, layout=c(2,3), data = data, main='Distribution of Raw Variables', sub= 'Figure 1', col="#8C96C6", breaks = 50, scales='free')   
+```
+
+```{r mean_sd}
+# print out all the means
+mean(data$MEDHVAL)
+mean(data$NBELPOV100)
+mean(data$PCTBACHMOR)
+mean(data$PCTVACANT)
+mean(data$PCTSINGLES)
+
+# print out all the standard deviations
+sd(data$MEDHVAL)
+sd(data$NBELPOV100)
+sd(data$PCTBACHMOR)
+sd(data$PCTVACANT)
+sd(data$PCTSINGLES)
+```
+
+```{r ln_plots}
+#1a. ii.
+# create and name new log variables
+LNMEDHVAL <- log(data$MEDHVAL)
+LNNBELPOV100 <- log(1+data$NBELPOV100)
+LNPCTBACHMOR <- log(1+data$PCTBACHMOR)
+LNPCTVACANT <- log(1+data$PCTVACANT)
+LNPCTSINGLES <- log(1+data$PCTSINGLES)
+
+# plot all the histograms for new log variables
+hist(LNMEDHVAL)
+hist(LNNBELPOV100)
+hist(LNPCTBACHMOR)
+hist(LNPCTVACANT)
+hist(LNPCTSINGLES)
+
+LNhists <- histogram( ~ LNMEDHVAL +LNPCTBACHMOR +LNPCTVACANT +LNPCTSINGLES  +LNNBELPOV100, layout=c(2,3), data = data, main='Distribution of Natural Log of Variables', sub= 'Figure 2', col="#B5C7F4", breaks = 50, scales='free') 
+```
+
+```{r 1b}
+# 1b. 
+# create four scatter plots
+
+# create a plotting window with 2*2 array
+par(mfrow=c(2,2))
+plot(data$NBELPOV100, data$MEDHVAL)
+plot(data$PCTBACHMOR, data$MEDHVAL)
+plot(data$PCTVACANT, data$MEDHVAL)
+plot(data$PCTSINGLES, data$MEDHVAL)
+
+# correlations between the variables
+# cor(data$PCTBACHMOR, data$NBELPOV100)
+# cor(data$PCTVACANT, data$NBELPOV100)
+# cor(data$PCTSINGLES, data$NBELPOV100)
+# cor(data$PCTBACHMOR, data$PCTSINGLES)
+# cor(data$PCTVACANT, data$PCTBACHMOR)
+# cor(data$PCTSINGLES, data$PCTVACANT)
+cor(data, method=c("pearson"))
+```
+
