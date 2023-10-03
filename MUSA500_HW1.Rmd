@@ -1,0 +1,174 @@
+---
+title: "MUSA500_HW1"
+output: html_document
+date: "2023-09-30"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Homework 1
+
+### group member: Hang Zhao; Ling Chen; Jiahang Li
+
+1. import the data
+```{r}
+data <- read.csv("/Users/hangzhao/Documents/R/RegressionData.csv")
+```
+
+1a. using 'hist', 'mean', and 'sd' commands
+```{r}
+# plot all the histograms
+hist(data$MEDHVAL, breaks = 50)
+hist(data$NBELPOV100, breaks = 50)
+hist(data$PCTBACHMOR, breaks = 50)
+hist(data$PCTVACANT, breaks = 50)
+hist(data$PCTSINGLES, breaks = 50)
+
+# print out all the means
+mean(data$MEDHVAL)
+mean(data$NBELPOV100)
+mean(data$PCTBACHMOR)
+mean(data$PCTVACANT)
+mean(data$PCTSINGLES)
+
+# print out all the standard deviations
+sd(data$MEDHVAL)
+sd(data$NBELPOV100)
+sd(data$PCTBACHMOR)
+sd(data$PCTVACANT)
+sd(data$PCTSINGLES)
+```
+
+1a. i. Put the result in a table
+
+1a. ii. using 'log' command to create 5 new variables
+```{r}
+# create and name new log variables
+LNMEDHVAL <- log(data$MEDHVAL+1)
+LNNBELPOV100 <- log(data$NBELPOV100+1)
+LNPCTBACHMOR <- log(data$PCTBACHMOR+1)
+LNPCTVACANT <- log(data$PCTVACANT+1)
+LNPCTSINGLES <- log(data$PCTSINGLES+1)
+```
+
+plot new histograms
+```{r}
+# plot all the histograms for new log variables
+hist(LNMEDHVAL, breaks = 50)
+hist(LNNBELPOV100, breaks = 50)
+hist(LNPCTBACHMOR, breaks = 50)
+hist(LNPCTVACANT, breaks = 50)
+hist(LNPCTSINGLES, breaks = 50)
+```
+
+1b. create four scatter plots
+```{r}
+# create a plotting window with 2*2 array
+par(mfrow=c(2,2))
+plot(data$NBELPOV100, data$MEDHVAL)
+plot(data$PCTBACHMOR, data$MEDHVAL)
+plot(data$PCTVACANT, data$MEDHVAL)
+plot(data$PCTSINGLES, data$MEDHVAL)
+```
+
+1c. Look at the Pearson Correlations using 'cor' command
+```{r}
+# correlation matrix
+cor(data, method=c("pearson"))
+```
+
+1d. using 'readOGR' command in the 'rgdal' library
+```{r}
+# first load the rgdal library
+library(rgdal)
+```
+
+Load the shp data
+```{r}
+setwd("/Users/hangzhao/Documents/R")
+phillydata <- readOGR("Lecture 1 - RegressionData.shp/RegressionData.shp")
+```
+
+only **LNMEDHVAL** map should be one single figure
+the other four should be in one figure with four maps
+```{r}
+# plot the choropleth graph for Median House Value
+spplot(phillydata, "LNMEDHVAL")
+```
+
+
+```{r}
+
+PCTVACANT = phillydata["PCTVACANT"]
+PCTSINGLES = phillydata["PCTSINGLES"]
+PCTBACHEMOR = phillydata["PCTBACHMOR"]
+LNNBELPOV = phillydata["LNNBELPOV"]
+par(mar = c(1, 1, 1, 1))
+spplot(phillydata, c("PCTVACANT", "PCTSINGLES", "PCTBACHMOR",
+                     "LNNBELPOV"), col = "transparent", scale = 30)
+
+```
+
+2. exploratory analysis of the data
+```{r}
+# first clean the data
+any(is.infinite(LNNBELPOV100))
+# replace inf value to NA
+LNNBELPOV100[is.infinite(LNNBELPOV100)] <- NA
+# then replace na value to 0
+LNNBELPOV100[is.na(LNNBELPOV100)] <- 0
+```
+
+2a. using 'lm' command to run regression
+```{r}
+# run the 'lm' function
+lm1 <- lm(LNMEDHVAL ~ PCTVACANT + PCTSINGLES + PCTBACHMOR + LNNBELPOV100, 
+          data=data)
+```
+
+2b. present the summary of the fit
+```{r}
+# print out the statistical summary table
+summary(lm1)
+```
+```{r}
+# check the anova result
+anova(lm1)
+```
+
+
+$$
+Y \sim X\beta_0 + X\beta_1 + \epsilon
+$$
+
+$$
+\epsilon \sim N(0,\sigma^2)
+$$
+2c. using 'fitted', 'residuals', and 'rstandard' commands
+```{r}
+# run 'fitted', 'residuals', and 'standardized' functions
+fit <- fitted(lm1)
+SSE <- residuals(lm1)
+standardized <- rstandard(lm1)
+```
+
+2d. create the scatter plot, standardized versus fit
+```{r}
+# plot the standardized residuals versus predicted values scatter graph
+plot(fit, standardized)
+```
+
+3. using stepwise regression and determine best model
+```{r}
+# first install library
+library(MASS)
+best_model <- lm(LNMEDHVAL ~ PCTVACANT + PCTSINGLES + PCTBACHMOR + LNNBELPOV100, data=data)
+step <- stepAIC(best_model, direction="both")
+# stepwise regression - Analysis of Variance (ANOVA)
+step$anova
+```
+
+
+
