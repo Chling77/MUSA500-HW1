@@ -37,16 +37,21 @@ library(tidyverse) #for ggplot
 library(sf) #for maps
 library(cowplot) #for plotgrid
 library(classInt)#for jenks breaks
-library(rgdal)
+#library(rgdal)
 library(ggplot2)
 library(RColorBrewer)
 library(broom)
 library(r2symbols)
+library(lattice)
 
 options(scipen=999)
 
 data <- read.csv("https://raw.githubusercontent.com/Chling77/MUSA500-HW1/main/Data/RegressionData.csv")
 data_geom <-st_read("D:/00Penn-学习/MUSA500/HW 1/RegressionData_geom/RegressionData.shp")
+
+source("https://raw.githubusercontent.com/urbanSpatial/Public-Policy-Analytics-Landing/master/functions.r")
+
+palette5 <- c("#f0f9e8","#bae4bc","#7bccc4","#43a2ca","#0868ac")
 
 ```
 
@@ -74,19 +79,17 @@ xxxxxxxx
 
 # **Results**
 
-```{r plot}
-library(lattice)
+1a. using 'hist', 'mean', and 'sd' commands
+```{r}
 # plot all the histograms
-hist(data$MEDHVAL)
-hist(data$NBELPOV100)
-hist(data$PCTBACHMOR)
-hist(data$PCTVACANT)
-hist(data$PCTSINGLES)
+hist(data$MEDHVAL, breaks = 50)
+hist(data$NBELPOV100, breaks = 50)
+hist(data$PCTBACHMOR, breaks = 50)
+hist(data$PCTVACANT, breaks = 50)
+hist(data$PCTSINGLES, breaks = 50)
 
-hists <- histogram( ~ MEDHVAL +PCTBACHMOR +PCTVACANT +PCTSINGLES  +NBELPOV100, layout=c(2,3), data = data, main='Distribution of Raw Variables', sub= 'Figure 1', col="#8C96C6", breaks = 50, scales='free')   
-```
+hists <- histogram( ~ MEDHVAL +PCTBACHMOR +PCTVACANT +PCTSINGLES  +NBELPOV100, layout=c(2,3), data = data, main='Distribution of Raw Variables', sub= 'Figure 1', col="#8C96C6", breaks = 50, scales='free') 
 
-```{r mean_sd}
 # print out all the means
 mean(data$MEDHVAL)
 mean(data$NBELPOV100)
@@ -102,43 +105,127 @@ sd(data$PCTVACANT)
 sd(data$PCTSINGLES)
 ```
 
-```{r ln_plots}
-#1a. ii.
+1a. i. Put the result in a table
+
+1a. ii. using 'log' command to create 5 new variables
+```{r}
 # create and name new log variables
 LNMEDHVAL <- log(data$MEDHVAL)
-LNNBELPOV100 <- log(1+data$NBELPOV100)
-LNPCTBACHMOR <- log(1+data$PCTBACHMOR)
-LNPCTVACANT <- log(1+data$PCTVACANT)
-LNPCTSINGLES <- log(1+data$PCTSINGLES)
+LNNBELPOV100 <- log(data$NBELPOV100+1)
+LNPCTBACHMOR <- log(data$PCTBACHMOR+1)
+LNPCTVACANT <- log(data$PCTVACANT+1)
+LNPCTSINGLES <- log(data$PCTSINGLES+1)
+```
 
+plot new histograms
+```{r}
 # plot all the histograms for new log variables
-hist(LNMEDHVAL)
-hist(LNNBELPOV100)
-hist(LNPCTBACHMOR)
-hist(LNPCTVACANT)
-hist(LNPCTSINGLES)
+hist(LNMEDHVAL, breaks = 50)
+hist(LNNBELPOV100, breaks = 50)
+hist(LNPCTBACHMOR, breaks = 50)
+hist(LNPCTVACANT, breaks = 50)
+hist(LNPCTSINGLES, breaks = 50)
 
 LNhists <- histogram( ~ LNMEDHVAL +LNPCTBACHMOR +LNPCTVACANT +LNPCTSINGLES  +LNNBELPOV100, layout=c(2,3), data = data, main='Distribution of Natural Log of Variables', sub= 'Figure 2', col="#B5C7F4", breaks = 50, scales='free') 
 ```
 
-```{r 1b}
-# 1b. 
-# create four scatter plots
-
+1b. create four scatter plots
+```{r}
 # create a plotting window with 2*2 array
 par(mfrow=c(2,2))
 plot(data$NBELPOV100, data$MEDHVAL)
 plot(data$PCTBACHMOR, data$MEDHVAL)
 plot(data$PCTVACANT, data$MEDHVAL)
 plot(data$PCTSINGLES, data$MEDHVAL)
+```
 
-# correlations between the variables
-# cor(data$PCTBACHMOR, data$NBELPOV100)
-# cor(data$PCTVACANT, data$NBELPOV100)
-# cor(data$PCTSINGLES, data$NBELPOV100)
-# cor(data$PCTBACHMOR, data$PCTSINGLES)
-# cor(data$PCTVACANT, data$PCTBACHMOR)
-# cor(data$PCTSINGLES, data$PCTVACANT)
+1c. Look at the Pearson Correlations using 'cor' command
+```{r}
+# correlation matrix
 cor(data, method=c("pearson"))
 ```
 
+
+only **LNMEDHVAL** map should be one single figure
+the other four should be in one figure with four maps
+```{r fig.height=6, fig.width=8}
+# plot the choropleth graph for Median House Value
+ggplot(data_geom) +
+  geom_sf(aes(fill = LNMEDHVAL)) +
+  scale_fill_gradient(low = "blue", high = "yellow", name = "Median House Value (log scale)") +
+  labs(title = "Choropleth Map of Median House Value",
+       subtitle = "Date Source: U.S. Census",
+       caption ="Figure 1")+
+  mapTheme()
+```
+
+
+#这一步还没改成ggplot，步骤同上，后续更新
+```{r}
+
+PCTVACANT = data_geom["PCTVACANT"]
+PCTSINGLES = data_geom["PCTSINGLES"]
+PCTBACHEMOR = data_geom["PCTBACHMOR"]
+LNNBELPOV = data_geom["LNNBELPOV"]
+par(mar = c(1, 1, 1, 1))
+spplot(data_geom, c("PCTVACANT", "PCTSINGLES", "PCTBACHMOR",
+                     "LNNBELPOV"), col = "transparent", scale = 30)
+
+```
+
+2. exploratory analysis of the data
+```{r}
+# first clean the data
+any(is.infinite(LNNBELPOV100))
+# replace inf value to NA
+LNNBELPOV100[is.infinite(LNNBELPOV100)] <- NA
+# then replace na value to 0
+LNNBELPOV100[is.na(LNNBELPOV100)] <- 0
+```
+
+2a. using 'lm' command to run regression
+```{r}
+# run the 'lm' function
+lm1 <- lm(LNMEDHVAL ~ PCTVACANT + PCTSINGLES + PCTBACHMOR + LNNBELPOV100, 
+          data=data)
+```
+
+2b. present the summary of the fit
+```{r}
+# print out the statistical summary table
+summary(lm1)
+```
+```{r}
+# check the anova result
+anova(lm1)
+```
+
+
+$$
+Y \sim X\beta_0 + X\beta_1 + \epsilon
+$$
+
+$$
+\epsilon \sim N(0,\sigma^2)
+$$
+2c. using 'fitted', 'residuals', and 'rstandard' commands
+```{r}
+# run 'fitted', 'residuals', and 'standardized' functions
+fit <- fitted(lm1)
+SSE <- residuals(lm1)
+standardized <- rstandard(lm1)
+```
+
+2d. create the scatter plot, standardized versus fit
+```{r}
+# plot the standardized residuals versus predicted values scatter graph
+plot(fit, standardized)
+```
+
+3. using stepwise regression and determine best model
+```{r}
+best_model <- lm(LNMEDHVAL ~ PCTVACANT + PCTSINGLES + PCTBACHMOR + LNNBELPOV100, data=data)
+step <- stepAIC(best_model, direction="both")
+# stepwise regression - Analysis of Variance (ANOVA)
+step$anova
+```
