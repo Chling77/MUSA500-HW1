@@ -55,6 +55,19 @@ palette5 <- c("#f0f9e8","#bae4bc","#7bccc4","#43a2ca","#0868ac")
 
 ```
 
+```{r, warning = FALSE, message = FALSE}
+newqBr <- function(df, variable, rnd) {
+  if (missing(rnd)) {
+    as.character(quantile(round(df[[variable]],4),
+                          c(.01,.2,.4,.6,.8), na.rm=T))
+  } else if (rnd == FALSE | rnd == F) {
+    as.character(formatC(quantile(df[[variable]],
+                                  c(.01,.2,.4,.6,.8), na.rm=T),
+                         digits = 3))
+  }
+}
+```
+
 # **Introduction**
 
 xxxxxxx
@@ -116,6 +129,8 @@ LNPCTBACHMOR <- log(data$PCTBACHMOR+1)
 LNPCTVACANT <- log(data$PCTVACANT+1)
 LNPCTSINGLES <- log(data$PCTSINGLES+1)
 ```
+MEDHVAL, BELPOV100: use log
+other independent variables: use original variables
 
 plot new histograms
 ```{r}
@@ -148,30 +163,96 @@ cor(data, method=c("pearson"))
 
 only **LNMEDHVAL** map should be one single figure
 the other four should be in one figure with four maps
+
+
 ```{r fig.height=6, fig.width=8}
 # plot the choropleth graph for Median House Value
+Plot1 <-ggplot(data_geom) +
+  geom_sf(aes(fill = q5(LNMEDHVAL))) +
+  scale_fill_manual(values = palette5,
+                    labels= newqBr(data_geom, "LNMEDHVAL"),
+                    name = "LN Median House Value\n(Quintile Breaks)")+
+  labs(title = "LN Median House Value in Philadelphia",
+       subtitle = "Date Source: U.S. Census",
+       caption ="Figure 1")+
+  mapTheme()
+```
+
+```{r fig.height=6, fig.width=8}
+# plot the choropleth graph for Median House Value (another way) 感觉用连续变量可视化的图区分度不是很明显，所以后续都采用Quintile Breaks分类后的离散变量进行可视化
+
 ggplot(data_geom) +
   geom_sf(aes(fill = LNMEDHVAL)) +
-  scale_fill_gradient(low = "blue", high = "yellow", name = "Median House Value (log scale)") +
-  labs(title = "Choropleth Map of Median House Value",
+  scale_fill_distiller(palette = "YlGnBu",
+                    name = "LN Median House Value") +
+  labs(title = "Choropleth Map of LN Median House Value in Philadelphia",
        subtitle = "Date Source: U.S. Census",
        caption ="Figure 1")+
   mapTheme()
 ```
 
 
-#这一步还没改成ggplot，步骤同上，后续更新
-```{r}
-
-PCTVACANT = data_geom["PCTVACANT"]
-PCTSINGLES = data_geom["PCTSINGLES"]
-PCTBACHEMOR = data_geom["PCTBACHMOR"]
-LNNBELPOV = data_geom["LNNBELPOV"]
-par(mar = c(1, 1, 1, 1))
-spplot(data_geom, c("PCTVACANT", "PCTSINGLES", "PCTBACHMOR",
-                     "LNNBELPOV"), col = "transparent", scale = 30)
-
+```{r fig.height=6, fig.width=8}
+# plot the choropleth graph for LN number of households living in poverty
+plot2 <- ggplot(data_geom) +
+  geom_sf(aes(fill = q5(LNNBELPOV))) +
+  scale_fill_manual(values = palette5,
+                    labels= newqBr(data_geom, "LNNBELPOV"),
+                    name = "LN Households in Poverty\n(Quintile Breaks)")+
+  labs(title = "LN number of households living in poverty in Philadelphia",
+       subtitle = "Date Source: U.S. Census",
+       caption ="Figure 2")+
+  mapTheme()
 ```
+
+```{r fig.height=6, fig.width=8}
+# plot the choropleth graph for Proportion of housing units that are vacant
+plot3<- ggplot(data_geom) +
+  geom_sf(aes(fill = q5(PCTVACANT))) +
+  scale_fill_manual(values = palette5,
+                    labels= newqBr(data_geom, "PCTVACANT"),
+                    name = "Precentage of Vacant housing units(%)\n(Quintile Breaks)")+
+  labs(title = "Proportion of housing units that are vacant in Philadelphia",
+       subtitle = "Date Source: U.S. Census",
+       caption ="Figure 3")+
+  mapTheme()
+```
+
+```{r fig.height=6, fig.width=8}
+# plot the choropleth graph for Percent of housing units that are detached single family houses
+plot4 <- ggplot(data_geom) +
+  geom_sf(aes(fill = q5(PCTSINGLES))) +
+  scale_fill_manual(values = palette5,
+                    labels= newqBr(data_geom, "PCTSINGLES"),
+                    name = "Precentage of housing units:detached single family houses(%)\n(Quintile Breaks)")+
+  labs(title = "Percent of housing units that are detached single family houses in Philadelphia",
+       subtitle = "Date Source: U.S. Census",
+       caption ="Figure 4")+
+  mapTheme()
+```
+
+```{r fig.height=6, fig.width=8}
+# plot the choropleth graph for Proportion of residents in Block Group with at least a bachelor’s degree
+plot5 <- ggplot(data_geom) +
+  geom_sf(aes(fill = q5(PCTBACHMOR))) +
+  scale_fill_manual(values = palette5,
+                    labels= newqBr(data_geom, "PCTBACHMOR"),
+                    name = "Precentage of residents with at least a bachelor's degree(%)\n(Quintile Breaks)")+
+  labs(title = "Proportion of residents in Block Group with at least a bachelor’s degree in Philadelphia",
+       subtitle = "Date Source: U.S. Census",
+       caption ="Figure 5")+
+  mapTheme()
+```
+
+```{r}
+mapgrid <- plot_grid( plot2, 
+                      plot3, 
+                      plot4, 
+                      plot5,
+                      align = c("hv","hv","hv","hv"),
+                          ncol = 2, nrow = 2)
+```
+
 
 2. exploratory analysis of the data
 ```{r}
