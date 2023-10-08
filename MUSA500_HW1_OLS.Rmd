@@ -123,11 +123,12 @@ sd(data$PCTSINGLES)
 1a. ii. using 'log' command to create 5 new variables
 ```{r}
 # create and name new log variables
-LNMEDHVAL <- log(data$MEDHVAL)
-LNNBELPOV100 <- log(data$NBELPOV100+1)
-LNPCTBACHMOR <- log(data$PCTBACHMOR+1)
-LNPCTVACANT <- log(data$PCTVACANT+1)
-LNPCTSINGLES <- log(data$PCTSINGLES+1)
+data$LNMEDHVAL <- log(data$MEDHVAL + 1)
+data$LNNBELPOV100 <- log(data$NBELPOV100+1)
+data$LNPCTBACHMOR <- log(data$PCTBACHMOR+1)
+data$LNPCTVACANT <- log(data$PCTVACANT+1)
+data$LNPCTSINGLES <- log(data$PCTSINGLES+1)
+
 ```
 MEDHVAL, BELPOV100: use log
 other independent variables: use original variables
