@@ -311,18 +311,21 @@ step <- stepAIC(best_model, direction="both")
 # stepwise regression - Analysis of Variance (ANOVA)
 step$anova
 ```
-#kfold
-fit <- lm(MEDHVAL~ PCTBACHMOR + PCTVACANT + MEDHHINC + PCTSINGLES, data=assignmentdata)
+#Kfoldmodel
+#Oroginal model
+#set.seed(125)
+fit <- lm(LNMEDHVAL~ PCTBACHMOR + PCTVACANT + PCTSINGLES + LNNBELPOV100, data=assignmentdata)
 summary(fit)
-cv <- CVlm(data=assignmentdata, fit, m=5)
+cv <- CVlm(data = assignmentdata, fit, m=5)
 mse <- attr(cv, "ms")
 rmse <- sqrt(mse)						#Obtaining RMSE for model 1
 rmse
 
 #model2
-fit <- lm(MEDHVAL~ PCTVACANT + MEDHHINC, data=assignmentdata)
+fit <- lm(LNMEDHVAL~ PCTVACANT + MEDHHINC, data=assignmentdata)
 summary(fit)
 cv <- CVlm(data=assignmentdata, fit, m=5)
 mse <- attr(cv, "ms")
-rmse <- sqrt(mse)						#Obtaining RMSE for model 1
+rmse <- sqrt(mse)						#Obtaining RMSE for model 2
 rmse
+
