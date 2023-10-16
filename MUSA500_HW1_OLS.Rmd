@@ -382,7 +382,7 @@ plot(fit, standardized)
 
 3. using stepwise regression and determine best model
 ```{r}
-best_model <- lm(LNMEDHVAL ~ PCTVACANT + PCTSINGLES + PCTBACHMOR + LNNBELPOV100, data=data)
+best_model <- lm(LNMEDHVAL ~ PCTVACANT + PCTSINGLES + PCTBACHMOR + LNNBELPOV100, data=data_cor)
 step <- stepAIC(best_model, direction="both")
 # stepwise regression - Analysis of Variance (ANOVA)
 step$anova
@@ -393,7 +393,7 @@ step$anova
 ```{r}
 #Original model,set.seed(125)
 fit1 <- lm(LNMEDHVAL~ PCTBACHMOR + PCTVACANT + PCTSINGLES + LNNBELPOV100, data=data_cor)
-summary(fit)
+summary(fit1)
 cv <- CVlm(data = data_cor, fit, m=5)
 mse <- attr(cv, "ms")
 rmse <- sqrt(mse)			#Obtaining RMSE for model 1
@@ -403,7 +403,7 @@ rmse
 ```{r}
 #model2
 fit2 <- lm(LNMEDHVAL~ PCTVACANT + MEDHHINC, data=data_geom)
-summary(fit)
+summary(fit2)
 cv <- CVlm(data=st_drop_geometry(data_geom), fit, m=5)
 mse <- attr(cv, "ms")
 rmse <- sqrt(mse)				#Obtaining RMSE for model 2
