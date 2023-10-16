@@ -194,15 +194,6 @@ hist(LNPCTSINGLES, breaks = 50)
 LNhists <- histogram( ~ LNMEDHVAL +LNPCTBACHMOR +LNPCTVACANT +LNPCTSINGLES  +LNNBELPOV100, layout=c(2,3), data = data, main='Distribution of Natural Log of Variables', sub= 'Figure 2', col="#B5C7F4", breaks = 50, scales='free') 
 ```
 
-1b. create four scatter plots
-```{r}
-# create a plotting window with 2*2 array
-par(mfrow=c(2,2))
-plot(data$NBELPOV100, data$MEDHVAL)
-plot(data$PCTBACHMOR, data$MEDHVAL)
-plot(data$PCTVACANT, data$MEDHVAL)
-plot(data$PCTSINGLES, data$MEDHVAL)
-```
 
 1c. Look at the Pearson Correlations
 ```{r}
@@ -363,7 +354,27 @@ SSE <- residuals(lm1)
 standardized <- rstandard(lm1)
 ```
 
-2d. create the scatter plot, standardized versus fit
+
+c-ii
+Create four scatter plots: check Linear relationship between dependent variable and each of the predictors
+```{r}
+# create a plotting window with 2*2 array
+par(mfrow=c(2,2))
+plot(data$NBELPOV100, data$MEDHVAL)
+plot(data$PCTBACHMOR, data$MEDHVAL)
+plot(data$PCTVACANT, data$MEDHVAL)
+plot(data$PCTSINGLES, data$MEDHVAL)
+```
+
+c-iii Normality of residuals 
+```{r}
+#Residuals (and histogram of residuals)
+data_cor$resids <- residuals(lm1)
+hist(data_cor$resids)
+```
+
+
+c-iv create the scatter plot, standardized versus fit
 ```{r}
 # plot the standardized residuals versus predicted values scatter graph
 plot(fit, standardized)
