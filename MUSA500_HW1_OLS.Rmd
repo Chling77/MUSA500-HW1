@@ -70,25 +70,75 @@ newqBr <- function(df, variable, rnd) {
 
 # **Introduction**
 
-xxxxxxx
+Philadelphia, renowned for its rich history and pulsating present, is home to a continually evolving real estate environment. However, a study by the Economic League reveals a nuanced picture: the overall proportion of Philadelphia households grappling with housing cost burden experienced a decrease from 29.8% to 26.7% between 2016 and 2021. Nevertheless, this alteration in cost burden manifested divergently across various income brackets. Considering housing is a fundamental human necessity, ensuring affordability is crucial for maintaining well-being and quality of life. Consequently, comprehending the factors that influence housing values is essential for exerting better control over the housing market and making more strategic, informed decisions.
+
+
+This report aims to explore the relationship between median house values and various neighborhood characteristics within the city of Philadelphia. It is widely understood that property values are influenced by both the conditions of the housing and the economic status of the property owners. By analyzing data at the Census block group level, we aim to comprehend the influence of neighborhood characteristics, including median value of all owner occupied housing units, proportion of residents in Block Group with at least a bachelor’s degree, housing vacancy, percent of housing units that are detached single family houses, poverty, and median household income, on median house values.
+
 
 # **Methods**
 
 ## **a. Data Cleaning**
 
-xxxxxxxxxxxxx
+The data focuses on a variety of demographic variables in the census data, starting with 1,816 census data by census block level. To further refine the dataset, a systematic data cleansing process is employed that ultimately cleans the dataset into 1,720 observations. Firstly, block groups with a population of less than 40, those without any housing units, and those with median house values lower than $10,000 are identified and flagged for further action. Additionally, an outlier block group in North Philadelphia, characterized by an unusually high median house value (over $800,000) and very low median household income (less than $8,000), is isolated. These identified anomalies are either removed from the dataset or corrected as needed, ensuring that the final dataset consisted of 1720 clean and validated observations. Comprehensive documentation and quality checks are performed throughout the process to maintain data integrity and transparency.
 
 ## **b. Exploratory Analysis**
 
-xxxxxxxxxx
+The first step involves importing a dataset from "RegressionData.csv" into R, examining the distribution of the dependent variable (MEDHVAL) and predictors (PCBACHMORE, NBELPOV100, PCTVACANT, PCTSINGLES) using histograms, and calculating their mean and standard deviation. Additionally, logarithmic transformations are applied to these variables, with a special transformation (log(1 + [VAR])) used for variables with zero values. The histograms of both the original and transformed variables are created to assess normality. Finally, a summary statistics table is constructed to present the mean and standard deviation of each variable.
+Understanding the characteristics of the data set and the distribution of the variables facilitates the assessment of linearity and normality. The method involves plotting scatter plots as well as using histograms to examine the distribution of the data. This process helps to determine the applicability of different regression models, as various models have different assumptions, such as normality of residuals. This comprehensive approach enables a thorough exploration of the dataset's characteristics, facilitates data normalization where necessary, and prepares the data for subsequent regression analysis. While it is possible for a non-normally distributed variable to have normally distributed values, it is more likely that if the variable itself is not normally distributed, its residuals will not be normally distributed either. This effort is consistent with the goal of creating interpretable regression models, as normally distributed variables and residuals are easier to interpret and comply with regression assumptions, ultimately improving the reliability and utility of the model for understanding relationships in the data.
+The next step is to assess the linearity of the relationships between the dependent variable (MEDHVAL) and each of the predictors (PCBACHMORE, NBELPOV100, PCTVACANT, PCTSINGLES). The methodology involves creating four scatter plots, one for each predictor, to visually examine the patterns and associations between these variables. This process enables a qualitative assessment of whether the relationships appear to be linear or exhibit other types of trends, which is crucial for determining the suitability of a linear regression model for subsequent analysis. The scatter plots provide a visual representation of the data, aiding in the decision-making process regarding the choice of regression techniques and the understanding of how predictors may influence the dependent variable.
+
+y = β0 + β1 * x + ε
+
+The third step is assessing the relationships between predictor variables by calculating Pearson correlations, with a focus on identifying multicollinearity among them. The methodology involves using the cor function in R to compute these correlations, producing a correlation matrix. The process entails examining the values in the correlation matrix to determine if any predictors exhibit strong pairwise correlations, which could indicate multicollinearity. Pearson's correlation coefficient is from -1 to 1, where -1 indicates a strong negative linear relationship, 1 indicates a strong positive linear relationship, and 0 implies no linear relationship. Multicollinearity, where predictor variables are highly correlated with each other, can lead to unstable and unreliable regression results. The aim is to decide whether it's appropriate to include all four variables as predictors in the regression model based on the observed correlations, ensuring a robust and interpretable model for subsequent analysis. 
+
+r = Σ((X_i - X̄) * (Y_i - Ȳ)) / [√(Σ(X_i - X̄)²) * √(Σ(Y_i - Ȳ)²)]
+
+Finally, visualizing spatial patterns and relationships within geographic data by creating choropleth maps for five variables. The methodology involves utilizing the R programming language and the sf package for importing and handling shapefile data, and the ggplot2 package for creating the choropleth maps. The process begins with importing the shapefile, then plotting each variable individually with color scales chosen for clarity and consistency. The final step combines all five maps into a single figure for presentation, facilitating a visual exploration of spatial distributions and correlations among these variables, enhancing the understanding of geographic patterns in the dataset.
+
 
 ## **c. Multiple Regression Analysis**
 
-xxxxxxxxxxxxxx
+Ordinary Least Squares (OLS) regression is a statistical technique to determine the relationships between a variable of interest, known as the dependent variable, and one or more independent explanatory variables, often referred to as predictors. It is often used to assess the strength and direction of the correlations between variables, indicating whether it's positive, negative, or no correlation. It also evaluates how well the model fits the data, providing goodness of fit information. Each beta coefficient of the predictors demonstrates to what extent the dependent variable will change when one unit changes in one of the predictors, holding all other predictors constant. However, while significant predictor variables indicate a certain relationship, they do not establish causation between variables.
+ 
+We use regression analysis to determine the correlation between the dependent variable, which is the natural log of median house value, representing as LNMEDHVAL, and the predictors which are proportion of housing units that are vacant PCTVACANT, percent of housing units that are detached single family houses PCTSINGLES, proportion of residents in Block Group with at least a bachelor’s degree PCTBACHMOR, and the natural log of number of households that income below 100% poverty level LNNBELPOV100. Our equation is shown as follow:
+
+
+Where β0 is the y-intercept, interpreting the value of the dependent variable when the predictors are 0; β1, β2, β3, β4 are the slope coefficients of the predictors. 
+
+For a linear regression model, for any fixed value of independent variable x, there are parameters 𝛽0, 𝛽i, and 𝜎, where i = 1 in a simple regression and i>1 in a multiple regression, such that 𝑦 = 𝛽0 + 𝛽i𝑥i +𝜀, where 𝜀~𝑁(0, 𝜎2). The term 𝜀 is known as an error term or residual, and for each observation i, is defined as a vertical deviation (distance) between the observed value of y and the predicted value of y, denoted by ŷ. In addition, 𝜀~𝑁(0, 𝜎2) means that the error terms have a normal distribution with mean of 0 and variance 𝜎2. This holds for any given value of x, the average error term will be 0, and a typical deviation from the regression line will be 𝜎 units. 
+
+There are several assumptions we have to make prior to the linear regression. 
+Check the linearity of each predictors and the dependent variable by creating scatter plots. If no linearity can be observed from the plots, variable transformation or polynomial regression might be better. 
+Examine the normality of residuals by plotting out the histogram. If the histogram is not normally distributed, log transformation may be used to normalize both dependent variable and predictor. However, sometimes log transformation is not appropriate, especially when there is high zero inflations. 
+Confirm homoscedasticity, which means that the variance of residuals should be constant throughout the different values of x.
+Predictors should not be strongly correlated with each other, which is also called to prevent multicollinearity. 
+No fewer than 10 observations per predictor. 
+
+Given n observations on y, and k predictors x1 … xk, the estimates β0, β1, β2, …. βk are chosen simultaneously to minimize the expression for the Error Sum of Squares (SSE), given by:
+
+
+where ŷ is the predicted y of the model, which equals to β0+β1x1+β2x2+.....+βkxk, with the minus sign before it would be demonstrated as the equation in the bracket. SSE represents the sum of squared error, or the sum of squared residuals ε, is the amount of variability in y that is not explained when accounting for x in the model. While there is another term SST, which means the total sum of squares, is demonstrated as the following equation: 
+
+where Ӯ here represents the overall mean of y values, therefore SST is interpreted as the squared deviation of that observation from the overall mean of y, and then summing those squared deviations across all observations i, without any regard to the value of x. 
+
+
+
+Sample correlation coefficient R is a point estimator of the population correlation 𝜌. 
+
+If we use the formula 1 – SSE/SST, we can get the coefficient of determination R2 which is the proportion of observed variation in the dependent variable y that was explained by the model, and always ranges between 0 and 1. 
+
+
+To assess our model, we examine the F-statistic and its corresponding p-value. The F-test, often referred to as the omnibus test, evaluates whether any of the independent variables in the model significantly predict the dependent variable. It tests the null hypothesis that none of the independent variables are significant predictors against the alternative hypothesis that at least one of them is. A model that fails to reject the null hypothesis is typically considered less effective. We then focus on the p-value associated with each independent variable. If the p-value for a specific independent variable is below 0.05, we can reject the null hypothesis, indicating that this particular predictor significantly influences the dependent variable. In this case, our null hypothesis, or H0 is that the correlation coefficient ρ equals to zero, and alternative  hypothesis or Ha states that the correlation coefficient ρ does not equal to zero, demonstrating as H0: ρ=0 and Ha: ρ≠0; 
+
 
 ## **d. Additional Analysis**
 
-xxxxxxxx
+Stepwise regression is a statistical method that allows us to understand the statistical relationship between independent and dependent variables. The process of stepwise regression screens candidate variables and automatically identifies influential variables. In this scenario, stepwise regression is used to examine the statistical relationship between the dependent variable (MEDHVAL) and predictors (PCBACHMORE, NBELPOV100, PCTVACANT, and PCTSINGLES) based on the Akaike Information Criterion (a mathematical method for evaluating how well a model fits the data it was generated from). Specifically, the algorithm adds or removes predictors to see if there is a significant change in the model fit determined by the AIC value and retains all predictors, resulting in substantial changes. However, there are limitations as well. Firstly, stepwise regression often leads to overfitting. To be more specific, sometimes the training data size is too small and needs more data samples to accurately represent all possible input data values, leading to poor generalization to new datasets. Furthermore, rather than relying on professional knowledge, the model relies on an automatic process of selecting predictive variables. Therefore, it may need to look into a more comprehensive model.
+
+
+The K-fold cross-validation is a method used for evaluating the performance of the regression model. In this scenario(k=5), the sample dataset is randomly divided into five folds for training and validation. During each run, one-fold is selected for validation, and the rest are used for training and further iterations. This process is repeated five times, each with a different fold serving as the validation set and the other four as the training set. After this process, we will get five different performance values for each fold, the average of which serves as a holistic performance metric to determine how generalizable our model is. In this scenario, we will use the root mean squared error (RMSE) as the referencing performance value to evaluate the model’s performance. The RMSE measures the average magnitude of errors between the predicted and observed values in a dataset. In other words, it tells us the standard deviation of the residuals (prediction errors).
+
 
 # **Results**
 
@@ -123,12 +173,11 @@ sd(data$PCTSINGLES)
 1a. ii. using 'log' command to create 5 new variables
 ```{r}
 # create and name new log variables
-data$LNMEDHVAL <- log(data$MEDHVAL + 1)
-data$LNNBELPOV100 <- log(data$NBELPOV100+1)
-data$LNPCTBACHMOR <- log(data$PCTBACHMOR+1)
-data$LNPCTVACANT <- log(data$PCTVACANT+1)
-data$LNPCTSINGLES <- log(data$PCTSINGLES+1)
-
+LNMEDHVAL <- log(data$MEDHVAL)
+LNNBELPOV100 <- log(data$NBELPOV100+1)
+LNPCTBACHMOR <- log(data$PCTBACHMOR+1)
+LNPCTVACANT <- log(data$PCTVACANT+1)
+LNPCTSINGLES <- log(data$PCTSINGLES+1)
 ```
 MEDHVAL, BELPOV100: use log
 other independent variables: use original variables
@@ -155,10 +204,24 @@ plot(data$PCTVACANT, data$MEDHVAL)
 plot(data$PCTSINGLES, data$MEDHVAL)
 ```
 
-1c. Look at the Pearson Correlations using 'cor' command
+1c. Look at the Pearson Correlations
 ```{r}
 # correlation matrix
-cor(data, method=c("pearson"))
+data_cor <- data_geom %>%
+  dplyr::select(LNMEDHVAL, LNNBELPOV, PCTBACHMOR, PCTVACANT, PCTSINGLES) %>%
+  st_drop_geometry()
+
+cor(data_cor, method=c("pearson"))
+```
+
+Look at multicollinearity (exclude the dependent variable in the correlation matrix)
+```{r}
+# correlation matrix
+data_cor_dependent <- data_geom %>%
+  dplyr::select(LNNBELPOV, PCTBACHMOR, PCTVACANT, PCTSINGLES) %>%
+  st_drop_geometry()
+
+cor(data_cor_dependent, method=c("pearson"))
 ```
 
 
@@ -169,7 +232,7 @@ the other four should be in one figure with four maps
 ```{r fig.height=6, fig.width=8}
 # plot the choropleth graph for Median House Value
 Plot1 <-ggplot(data_geom) +
-  geom_sf(aes(fill = q5(LNMEDHVAL))) +
+  geom_sf(aes(fill = q5(LNMEDHVAL)),linewidth = 0.01) +
   scale_fill_manual(values = palette5,
                     labels= newqBr(data_geom, "LNMEDHVAL"),
                     name = "LN Median House Value\n(Quintile Breaks)")+
@@ -177,26 +240,15 @@ Plot1 <-ggplot(data_geom) +
        subtitle = "Date Source: U.S. Census",
        caption ="Figure 1")+
   mapTheme()
-```
 
-```{r fig.height=6, fig.width=8}
-# plot the choropleth graph for Median House Value (another way) 感觉用连续变量可视化的图区分度不是很明显，所以后续都采用Quintile Breaks分类后的离散变量进行可视化
-
-ggplot(data_geom) +
-  geom_sf(aes(fill = LNMEDHVAL)) +
-  scale_fill_distiller(palette = "YlGnBu",
-                    name = "LN Median House Value") +
-  labs(title = "Choropleth Map of LN Median House Value in Philadelphia",
-       subtitle = "Date Source: U.S. Census",
-       caption ="Figure 1")+
-  mapTheme()
+Plot1
 ```
 
 
 ```{r fig.height=6, fig.width=8}
 # plot the choropleth graph for LN number of households living in poverty
-plot2 <- ggplot(data_geom) +
-  geom_sf(aes(fill = q5(LNNBELPOV))) +
+Plot2 <- ggplot(data_geom) +
+  geom_sf(aes(fill = q5(LNNBELPOV)),linewidth = 0.01) +
   scale_fill_manual(values = palette5,
                     labels= newqBr(data_geom, "LNNBELPOV"),
                     name = "LN Households in Poverty\n(Quintile Breaks)")+
@@ -204,12 +256,14 @@ plot2 <- ggplot(data_geom) +
        subtitle = "Date Source: U.S. Census",
        caption ="Figure 2")+
   mapTheme()
+
+Plot2
 ```
 
 ```{r fig.height=6, fig.width=8}
 # plot the choropleth graph for Proportion of housing units that are vacant
-plot3<- ggplot(data_geom) +
-  geom_sf(aes(fill = q5(PCTVACANT))) +
+Plot3<- ggplot(data_geom) +
+  geom_sf(aes(fill = q5(PCTVACANT)),linewidth = 0.01) +
   scale_fill_manual(values = palette5,
                     labels= newqBr(data_geom, "PCTVACANT"),
                     name = "Precentage of Vacant housing units(%)\n(Quintile Breaks)")+
@@ -217,12 +271,14 @@ plot3<- ggplot(data_geom) +
        subtitle = "Date Source: U.S. Census",
        caption ="Figure 3")+
   mapTheme()
+
+Plot3
 ```
 
 ```{r fig.height=6, fig.width=8}
 # plot the choropleth graph for Percent of housing units that are detached single family houses
-plot4 <- ggplot(data_geom) +
-  geom_sf(aes(fill = q5(PCTSINGLES))) +
+Plot4 <- ggplot(data_geom) +
+  geom_sf(aes(fill = q5(PCTSINGLES)),linewidth = 0.01) +
   scale_fill_manual(values = palette5,
                     labels= newqBr(data_geom, "PCTSINGLES"),
                     name = "Precentage of housing units:detached single family houses(%)\n(Quintile Breaks)")+
@@ -230,12 +286,14 @@ plot4 <- ggplot(data_geom) +
        subtitle = "Date Source: U.S. Census",
        caption ="Figure 4")+
   mapTheme()
+
+Plot4
 ```
 
 ```{r fig.height=6, fig.width=8}
 # plot the choropleth graph for Proportion of residents in Block Group with at least a bachelor’s degree
-plot5 <- ggplot(data_geom) +
-  geom_sf(aes(fill = q5(PCTBACHMOR))) +
+Plot5 <- ggplot(data_geom) +
+  geom_sf(aes(fill = q5(PCTBACHMOR)),linewidth = 0.01) +
   scale_fill_manual(values = palette5,
                     labels= newqBr(data_geom, "PCTBACHMOR"),
                     name = "Precentage of residents with at least a bachelor's degree(%)\n(Quintile Breaks)")+
@@ -243,15 +301,19 @@ plot5 <- ggplot(data_geom) +
        subtitle = "Date Source: U.S. Census",
        caption ="Figure 5")+
   mapTheme()
+
+Plot5
 ```
 
 ```{r}
-mapgrid <- plot_grid( plot2, 
-                      plot3, 
-                      plot4, 
-                      plot5,
+mapgrid <- plot_grid( Plot2, 
+                      Plot3, 
+                      Plot4, 
+                      Plot5,
                       align = c("hv","hv","hv","hv"),
                           ncol = 2, nrow = 2)
+
+mapgrid
 ```
 
 
@@ -268,15 +330,18 @@ LNNBELPOV100[is.na(LNNBELPOV100)] <- 0
 2a. using 'lm' command to run regression
 ```{r}
 # run the 'lm' function
-lm1 <- lm(LNMEDHVAL ~ PCTVACANT + PCTSINGLES + PCTBACHMOR + LNNBELPOV100, 
-          data=data)
+lm1 <- lm(LNMEDHVAL ~ PCTVACANT + PCTSINGLES + PCTBACHMOR + LNNBELPOV, 
+          data=data_cor)
 ```
+
+
 
 2b. present the summary of the fit
 ```{r}
 # print out the statistical summary table
 summary(lm1)
 ```
+
 ```{r}
 # check the anova result
 anova(lm1)
@@ -311,21 +376,25 @@ step <- stepAIC(best_model, direction="both")
 # stepwise regression - Analysis of Variance (ANOVA)
 step$anova
 ```
-#Kfoldmodel
-#Oroginal model
-#set.seed(125)
-fit <- lm(LNMEDHVAL~ PCTBACHMOR + PCTVACANT + PCTSINGLES + LNNBELPOV100, data=assignmentdata)
-summary(fit)
-cv <- CVlm(data = assignmentdata, fit, m=5)
-mse <- attr(cv, "ms")
-rmse <- sqrt(mse)						#Obtaining RMSE for model 1
-rmse
 
+4.K-fold model
+
+```{r}
+#Original model,set.seed(125)
+fit1 <- lm(LNMEDHVAL~ PCTBACHMOR + PCTVACANT + PCTSINGLES + LNNBELPOV100, data=data_cor)
+summary(fit)
+cv <- CVlm(data = data_cor, fit, m=5)
+mse <- attr(cv, "ms")
+rmse <- sqrt(mse)			#Obtaining RMSE for model 1
+rmse
+```
+
+```{r}
 #model2
-fit <- lm(LNMEDHVAL~ PCTVACANT + MEDHHINC, data=assignmentdata)
+fit2 <- lm(LNMEDHVAL~ PCTVACANT + MEDHHINC, data=data_geom)
 summary(fit)
-cv <- CVlm(data=assignmentdata, fit, m=5)
+cv <- CVlm(data=st_drop_geometry(data_geom), fit, m=5)
 mse <- attr(cv, "ms")
-rmse <- sqrt(mse)						#Obtaining RMSE for model 2
+rmse <- sqrt(mse)				#Obtaining RMSE for model 2
 rmse
-
+```
