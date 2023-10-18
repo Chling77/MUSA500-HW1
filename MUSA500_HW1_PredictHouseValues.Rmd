@@ -187,6 +187,9 @@ sd(data$PCTBACHMOR)
 sd(data$PCTVACANT)
 sd(data$PCTSINGLES)
 ```
+## Histograms and Log Transformation
+
+Histograms above illustrate the distribution of the dependent variable and the four predictors, where all of these histograms are positively skewed. Consequently, we have applied Log transformation to the original variables to normalize their distributions. We have added 1 to the log-transformed data to avoid Log(0) which is undefined. Following that, we present new histograms depicting the distribution of the log transformed variables.
 
 1a. i. Put the result in a table
 
@@ -214,6 +217,7 @@ hist(LNPCTSINGLES, breaks = 50)
 LNhists <- histogram( ~ LNMEDHVAL +LNPCTBACHMOR +LNPCTVACANT +LNPCTSINGLES  +LNNBELPOV100, layout=c(2,3), data = data, main='Distribution of Natural Log of Variables', sub= 'Figure 2', col="#B5C7F4", breaks = 50, scales='free') 
 ```
 
+From the new histograms, we can see that LNPCTBACHMOR, LNPCTVACANT, LNPCTSINGLES are all having zero inflations, which means that there are very high zero/low value bar in the histograms after log transformation. Keep that in mind, we will ony use Log Median House Value LNMEDHVAL, and Log Number of Household living in Poverty LNNBELPV100 for the following regression analysis, while keep the other three variables orginial. 
 
 1c. Look at the Pearson Correlations
 ```{r}
