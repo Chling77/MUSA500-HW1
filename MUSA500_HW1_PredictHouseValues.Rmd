@@ -83,19 +83,23 @@ This report aims to explore the relationship between median house values and var
 
 ## **Data Cleaning**
 
-The data focuses on a variety of demographic variables in the census data, starting with 1,816 census data by census block level. To further refine the dataset, a systematic data cleansing process is employed that ultimately cleans the dataset into 1,720 observations. Firstly, block groups with a population of less than 40, those without any housing units, and those with median house values lower than $10,000 are identified and flagged for further action. Additionally, an outlier block group in North Philadelphia, characterized by an unusually high median house value (over $800,000) and very low median household income (less than $8,000), is isolated. These identified anomalies are either removed from the dataset or corrected as needed, ensuring that the final dataset consisted of 1720 clean and validated observations. Comprehensive documentation and quality checks are performed throughout the process to maintain data integrity and transparency.
+The data focuses on a variety of demographic variables in the census data, starting with 1,816 census data by census block level. To further refine the dataset, a systematic data cleansing process is employed that ultimately cleans the dataset into 1,720 observations. Firstly, block groups with a population of less than 40, those without any housing units, and those with median house values lower than \$10,000 are identified and flagged for further action. Additionally, an outlier block group in North Philadelphia, characterized by an unusually high median house value (over \$800,000) and very low median household income (less than \$8,000), is isolated. These identified anomalies are either removed from the dataset or corrected as needed, ensuring that the final dataset consisted of 1720 clean and validated observations. Comprehensive documentation and quality checks are performed throughout the process to maintain data integrity and transparency.
 
 ## **Exploratory Analysis**
 
 The first step involves importing a dataset from "RegressionData.csv" into R, examining the distribution of the dependent variable (MEDHVAL) and predictors (PCBACHMORE, NBELPOV100, PCTVACANT, PCTSINGLES) using histograms, and calculating their mean and standard deviation. Additionally, logarithmic transformations are applied to these variables, with a special transformation (log(1 + [VAR])) used for variables with zero values. The histograms of both the original and transformed variables are created to assess normality. Finally, a summary statistics table is constructed to present the mean and standard deviation of each variable.
+
 Understanding the characteristics of the data set and the distribution of the variables facilitates the assessment of linearity and normality. The method involves plotting scatter plots as well as using histograms to examine the distribution of the data. This process helps to determine the applicability of different regression models, as various models have different assumptions, such as normality of residuals. This comprehensive approach enables a thorough exploration of the dataset's characteristics, facilitates data normalization where necessary, and prepares the data for subsequent regression analysis. While it is possible for a non-normally distributed variable to have normally distributed values, it is more likely that if the variable itself is not normally distributed, its residuals will not be normally distributed either. This effort is consistent with the goal of creating interpretable regression models, as normally distributed variables and residuals are easier to interpret and comply with regression assumptions, ultimately improving the reliability and utility of the model for understanding relationships in the data.
+
 The next step is to assess the linearity of the relationships between the dependent variable (MEDHVAL) and each of the predictors (PCBACHMORE, NBELPOV100, PCTVACANT, PCTSINGLES). The methodology involves creating four scatter plots, one for each predictor, to visually examine the patterns and associations between these variables. This process enables a qualitative assessment of whether the relationships appear to be linear or exhibit other types of trends, which is crucial for determining the suitability of a linear regression model for subsequent analysis. The scatter plots provide a visual representation of the data, aiding in the decision-making process regarding the choice of regression techniques and the understanding of how predictors may influence the dependent variable.
 
-y = β0 + β1 * x + ε
+$$y = \beta_{0} + \beta_{1} * x + ε$$
 
 The third step is assessing the relationships between predictor variables by calculating Pearson correlations, with a focus on identifying multicollinearity among them. The methodology involves using the cor function in R to compute these correlations, producing a correlation matrix. The process entails examining the values in the correlation matrix to determine if any predictors exhibit strong pairwise correlations, which could indicate multicollinearity. Pearson's correlation coefficient is from -1 to 1, where -1 indicates a strong negative linear relationship, 1 indicates a strong positive linear relationship, and 0 implies no linear relationship. Multicollinearity, where predictor variables are highly correlated with each other, can lead to unstable and unreliable regression results. The aim is to decide whether it's appropriate to include all four variables as predictors in the regression model based on the observed correlations, ensuring a robust and interpretable model for subsequent analysis. 
 
-r = Σ((X_i - X̄) * (Y_i - Ȳ)) / [√(Σ(X_i - X̄)²) * √(Σ(Y_i - Ȳ)²)]
+$$
+r = \frac{\sum((X_i - \bar{X}) \cdot (Y_i - \bar{Y}))}{\sqrt{\sum(X_i - \bar{X})^2} \cdot \sqrt{\sum(Y_i - \bar{Y})^2}}
+$$
 
 Finally, visualizing spatial patterns and relationships within geographic data by creating choropleth maps for five variables. The methodology involves utilizing the R programming language and the sf package for importing and handling shapefile data, and the ggplot2 package for creating the choropleth maps. The process begins with importing the shapefile, then plotting each variable individually with color scales chosen for clarity and consistency. The final step combines all five maps into a single figure for presentation, facilitating a visual exploration of spatial distributions and correlations among these variables, enhancing the understanding of geographic patterns in the dataset.
 
@@ -432,10 +436,30 @@ mapgrid2 <- plot_grid( Plot1,
 mapgrid2
 ```
 
-### Standardized regression residuals
+### Standardized regression residuals map
+
+From the map of the standardized regression residuals, there appear to be clusters of similar color. This suggests that there might be certain areas where the residuals are consistently high or low, which means the model might have systematically overestimated or underestimated the house values. In the map, giving the clustering of similar colors in certain regions, there appears to be some degree of positive spatial autocorrelation in the residuals.
+
+```{r fig.height=6, fig.width=8}
+data_geom <- data_geom %>%
+  dplyr::mutate(predvals = fitted(lm1),
+                resids = residuals(lm1),
+                stdres = rstandard(lm1))
 
 
+choro_stdreg <- ggplot(data_geom) +
+  geom_sf(aes(fill = q5(stdres)),linewidth = 0.01) +
+  scale_fill_manual(values = palette5,
+                    labels= newqBr(data_geom, "stdres"),
+                    name = "LN Median House Value\n(Quintile Breaks)")+
+  labs(title = "Standardized Residuals in Philadelphia by Block Group",
+       subtitle = "Date Source: U.S. Census",
+       caption ="Map")+
+  mapTheme()
 
+choro_stdreg
+
+```
 
 ## **Additional Models**
 
@@ -479,8 +503,10 @@ i.	Looking at the stepwise regression results, did the final model include all 4
 ii.	Looking at the cross-validation results, was the RMSE better for the 4 predictor model or the 2 predictor model?  
 
 ## Results - Ling
-c)	If you haven’t done that in the Results section, talk explicitly about the limitations of the model – that is, mention which assumptions were violated, and if applicable, how that may affect the model/parameter estimation/estimated significance. 
-i.	In addition, talk about the limitations of using the NBELPOV100 variable as a predictor – that is, what are some limitations of using the raw number of households living in poverty rather than a percentage?
+
+In terms of the model's limitations, it's important to note that the relationships between predictors and the dependent variable are not strictly linear. Only the relationship between PCTBACHMOR and MEDHVAL appears to be relatively linear. This violation of linearity assumptions could potentially introduce bias into parameter estimates and result in inaccurate outcomes. While attempts were made to address this by transforming some predictors using logarithmic transformations, certain predictors still contain significant zero values, so they were retained in their original form. Additionally, some predictors are interrelated with each other; for instance, the percentage of residents with at least a bachelor's degree is negatively correlated with the poverty status. Furthermore, an examination of the residuals map reveals the presence of spatial autocorrelation, which could lead to inefficient parameter estimates. As such, addressing nonlinear relationships, correlated observations, and spatial autocorrelation is crucial when modeling this data.
+ 
+Also, for out NBELPOV100 variable, we use raw numbers instead of percentage, which might make it difficult to compare across different geographical regions or time periods, as it lacks contexts or normalization. And this may further lead to misleading interpretations of the predictor's effect. On the other hand, it's also challenging to explain the practical implications of changes in the number of households in poverty without considering the total population or percentage of poverty.
 
 
 ## Explain the methods - Hang
