@@ -161,7 +161,7 @@ Variable                                            | Mean     | SD
 Dependent Variable                                  |          |
 Median House Value                                  | 66287.73 | 60006.08
 Predictors                                          |          | 
-# Households Living in Poverty.                     | 189.7709 | 164.3185
+N of Households Living in Poverty.                  | 189.7709 | 164.3185
 % of Individuals with Bechelor's Degrees or Higher  | 16.08137 | 17.76956
 % of Vacant Houses                                  | 11.28853 | 9.628472
 % of Single House Units                             | 9.226473 | 13.24925
