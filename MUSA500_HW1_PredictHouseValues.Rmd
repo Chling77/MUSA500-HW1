@@ -152,6 +152,20 @@ The K-fold cross-validation is a method used for evaluating the performance of t
 # **Results**
 
 ## **Exploratory Results**
+
+### Summary Statistics
+First of all, we import the csv and shp data files. To see the fundamental statistical information of the original data, we perform summary() function to see the mean values, and the sd() function to see the standard deviation of each variable. The results are shown below in the table. 
+
+Variable                                            | Mean     | SD
+--------------------------------------------------- | -------- | --------
+Dependent Variable                                  |          |
+Median House Value                                  | 66287.73 | 60006.08
+Predictors                                          |          | 
+# Households Living in Poverty.                     | 189.7709 | 164.3185
+% of Individuals with Bechelor's Degrees or Higher  | 16.08137 | 17.76956
+% of Vacant Houses                                  | 11.28853 | 9.628472
+% of Single House Units                             | 9.226473 | 13.24925
+
 1a. using 'hist', 'mean', and 'sd' commands
 ```{r}
 # plot all the histograms
@@ -163,12 +177,8 @@ hist(data$PCTSINGLES, breaks = 50)
 
 hists <- histogram( ~ MEDHVAL +PCTBACHMOR +PCTVACANT +PCTSINGLES  +NBELPOV100, layout=c(2,3), data = data, main='Distribution of Raw Variables', sub= 'Figure 1', col="#8C96C6", breaks = 50, scales='free') 
 
-# print out all the means
-mean(data$MEDHVAL)
-mean(data$NBELPOV100)
-mean(data$PCTBACHMOR)
-mean(data$PCTVACANT)
-mean(data$PCTSINGLES)
+# look at mean values in summary table
+summary(data)
 
 # print out all the standard deviations
 sd(data$MEDHVAL)
