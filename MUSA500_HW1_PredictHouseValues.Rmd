@@ -76,7 +76,7 @@ newqBr <- function(df, variable, rnd) {
 Philadelphia, renowned for its rich history and pulsating present, is home to a continually evolving real estate environment. However, a study by the Economic League reveals a nuanced picture: the overall proportion of Philadelphia households grappling with housing cost burden experienced a decrease from 29.8% to 26.7% between 2016 and 2021. Nevertheless, this alteration in cost burden manifested divergently across various income brackets. Considering housing is a fundamental human necessity, ensuring affordability is crucial for maintaining well-being and quality of life. Consequently, comprehending the factors that influence housing values is essential for exerting better control over the housing market and making more strategic, informed decisions.
 
 
-This report aims to explore the relationship between median house values and various neighborhood characteristics within the city of Philadelphia. It is widely understood that property values are influenced by both the conditions of the housing and the economic status of the property owners. By analyzing data at the Census block group level, we aim to comprehend the influence of neighborhood characteristics, including median value of all owner occupied housing units, proportion of residents in Block Group with at least a bachelor’s degree, housing vacancy, percent of housing units that are detached single family houses, poverty, and median household income, on median house values.
+This report aims to explore the relationship between median house values and various neighborhood characteristics within the city of Philadelphia. It is widely understood that property values are influenced by both the conditions of the housing and the economic status of the property owners. By analyzing data at the Census block group level, we aim to comprehend the relationship between neighborhood characteristics （including the proportion of residents in Block Group with at least a bachelor’s degree, housing vacancy, percent of housing units that are detached single-family houses, median household income） and the median value of all owner-occupied housing units.
 
 
 # **Methods**
@@ -141,10 +141,25 @@ To assess our model, we examine the F-statistic and its corresponding p-value. T
 
 ## **Additional Analyses**
 
-Stepwise regression is a statistical method that allows us to understand the statistical relationship between independent and dependent variables. The process of stepwise regression screens candidate variables and automatically identifies influential variables. In this scenario, stepwise regression is used to examine the statistical relationship between the dependent variable (MEDHVAL) and predictors (PCBACHMORE, NBELPOV100, PCTVACANT, and PCTSINGLES) based on the Akaike Information Criterion (a mathematical method for evaluating how well a model fits the data it was generated from). Specifically, the algorithm adds or removes predictors to see if there is a significant change in the model fit determined by the AIC value and retains all predictors, resulting in substantial changes. However, there are limitations as well. Firstly, stepwise regression often leads to overfitting. To be more specific, sometimes the training data size is too small and needs more data samples to accurately represent all possible input data values, leading to poor generalization to new datasets. Furthermore, rather than relying on professional knowledge, the model relies on an automatic process of selecting predictive variables. Therefore, it may need to look into a more comprehensive model.
+Stepwise regression is a statistical method that allows us to understand the statistical relationship between independent and dependent variables. The process of stepwise regression screens candidate variables and automatically identifies influential variables. In this scenario, stepwise regression is used to examine the statistical relationship between the dependent variable (MEDHVAL) and predictors (PCBACHMORE, NBELPOV100, PCTVACANT, and PCTSINGLES) based on the Akaike Information Criterion (a mathematical method for evaluating how well a model fits the data it was generated from). Specifically, the algorithm adds or removes predictors to see if there is a significant change in the model fit determined by the AIC value and retains all predictors resulting in substantial changes. However, there are limitations as well. Firstly, stepwise regression often leads to overfitting. To be more specific, sometimes the training data size is too small and needs more data samples to accurately represent all possible input data values, leading to poor generalization to new datasets. Furthermore, rather than relying on professional knowledge, the model relies on an automatic process of selecting predictive variables. Therefore, it may need to look into a more comprehensive model.
 
 
 The K-fold cross-validation is a method used for evaluating the performance of the regression model. In this scenario(k=5), the sample dataset is randomly divided into five folds for training and validation. During each run, one-fold is selected for validation, and the rest are used for training and further iterations. This process is repeated five times, each with a different fold serving as the validation set and the other four as the training set. After this process, we will get five different performance values for each fold, the average of which serves as a holistic performance metric to determine how generalizable our model is. In this scenario, we will use the root mean squared error (RMSE) as the referencing performance value to evaluate the model’s performance. The RMSE measures the average magnitude of errors between the predicted and observed values in a dataset. In other words, it tells us the standard deviation of the residuals (prediction errors).
+
+Turning to the discussion of the formula of the RMSE calculation, firstly, we need to get the SSE. In the formula below,  Xi stands for the observed values, Xn stands for the corresponding predicted values. The SSE is calculated as: 
+
+$$
+SSE = \sum_{i = 1}^{n}{(x_i- x_n )^2}
+$$
+We can then get the mean squared error (MSE) by dividing SSE by the number of observations n:
+$$
+MSE = \frac{\sum_{i = 1}^{n}{(x_i- x_n )^2}}{n}
+$$
+
+After taking the square root of the MSE, we get the value for RMSE:
+$$
+RMSE =\sqrt{\frac{\sum_{i = 1}^{n}{(x_i- x_n )^2}}{n}} 
+$$
 
 ## **Software**
 
@@ -512,9 +527,15 @@ rmse
 Recap what you did in the paper and your findings. Discuss what conclusions you can draw, which variables were significant and whether that was surprising or not.
 
 ## Model Quality - Jiahang
-b)	Talk about the quality of the model – that is, state if this is a good model overall (e.g., R2, F-ratio test), and what other predictors that we didn’t include in our model might be associated with our dependent variable.
-i.	Looking at the stepwise regression results, did the final model include all 4 predictors or were some dropped? What does that tell you about the quality of the model? 
-ii.	Looking at the cross-validation results, was the RMSE better for the 4 predictor model or the 2 predictor model?  
+The results from the three referenced models consistently indicate that they are high-quality models overall. After assessing the regression model, the output (the F-statistic is high, and the P-value is way much smaller than 0.05) suggests the strength of the regression model. To be more specific, the high F-statistic means that we can reject the null hypothesis that none of the independent variables in the model is a significant predictor of the dependent variable. Also, the multiple R-square (0.6623) indicates that approximately 66.23% of the variance in median house values can be explained by the model. 
+
+Also, in the stepwise regression results, all 4 predictors in the original model are retained in the final model, which means that the original model is the best model. That is to say, all variables have a statistically strong relationship with the dependent variables. 
+
+Moreover, based on the output of the cross-validation model, the original model, which considers all four variables, has a lower RMSE, 0.366 compared to the model solely relying on 'housing vacancy' and 'median household income' as predictors, which yields an RMSE of 0.443. This underscores the superiority of the original model.
+
+
+The output from the models all suggests that there is a strong relationship between median household value and residents’ educational level, housing vacancy, percent of housing units that are detached single-family houses, and median household income. To elaborate further, housing vacancy rates and the percentage of detached single-family houses serve as indicators of housing quality and pricing dynamics. Simultaneously, household income and residents' education levels are closely tied to economic status and the purchasing capacity of prospective homeowners. However, there is potential to enhance the model's comprehensiveness by introducing additional variables. For instance, the age of the housing stock exerts a profound influence on housing prices, and the number of bedrooms within a property can also significantly impact its market value. These considerations underscore the opportunity for enriching the model with a more comprehensive set of predictors.
+
 
 ## Results - Ling
 
