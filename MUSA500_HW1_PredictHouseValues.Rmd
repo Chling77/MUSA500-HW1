@@ -71,10 +71,10 @@ newqBr <- function(df, variable, rnd) {
 
 # **Introduction**
 
-Philadelphia, renowned for its rich history and pulsating present, is home to a continually evolving real estate environment. However, a study by the Economic League reveals a nuanced picture: the overall proportion of Philadelphia households grappling with housing cost burden experienced a decrease from 29.8% to 26.7% between 2016 and 2021. Nevertheless, this alteration in cost burden manifested divergently across various income brackets. Considering housing is a fundamental human necessity, ensuring affordability is crucial for maintaining well-being and quality of life. Consequently, comprehending the factors that influence housing values is essential for exerting better control over the housing market and making more strategic, informed decisions.
+Philadelphia, renowned for its rich history and pulsating present, is home to a continually evolving real estate environment. However, a study by the Economic League reveals a nuanced picture: the overall proportion of Philadelphia households grappling with housing cost burden experienced a decrease from 29.8% to 26.7% between 2016 and 2021(Economic League, 2023). Nevertheless, this alteration in cost burden manifested divergently across various income brackets. Considering housing is a fundamental human necessity, ensuring affordability is crucial for maintaining well-being and quality of life. Consequently, comprehending the factors that influence housing values is essential for exerting better control over the housing market and making more strategic, informed decisions.
 
 
-This report aims to explore the relationship between median house values and various neighborhood characteristics within the city of Philadelphia. It is widely understood that property values are influenced by both the conditions of the housing and the economic status of the property owners. By analyzing data at the Census block group level, we aim to comprehend the relationship between median house value and several neighborhood characteristics （the proportion of residents in the Block Group with at least a bachelor’s degree, housing vacancy, percentage of housing units that are detached single-family houses, and number of households living poverty).
+This report aims to explore the relationship between median house values and various neighborhood characteristics within the city of Philadelphia. It is widely understood that property values are influenced by both the conditions of the housing and the economic status of the property owners. By analyzing data at the Census block group level, we aim to comprehend the relationship between median house value and several neighborhood characteristics, including the proportion of residents in the Block Group with at least a bachelor’s degree, housing vacancy, percentage of housing units that are detached single-family houses, and number of households living poverty.
 
 
 # **Methods**
@@ -490,7 +490,7 @@ choro_stdreg
 
 ## **Additional Models**
 
-3. using stepwise regression and determine best model
+## using stepwise regression and determine the best model
 As is depicted in the result of the stepwise model, all 4 predictors in the original model are retained in the final model. To be more specific, compared with other models with some of the variables dropped, the original has the smallest AIC, -3448.16, indicating that the original model does the best prediction. 
 
 ```{r}
@@ -500,7 +500,7 @@ step <- stepAIC(best_model, direction="both")
 step$anova
 ```
 
-K-fold model
+## K-fold model
 After performing cross-validation on the models, we obtained the following results: the RMSE for the original regression model stands at 0.366, while the secondary model has an RMSE of 0.443.
 ```{r include=FALSE}
 #Original model,set.seed(125)
@@ -544,3 +544,6 @@ Also, for out NBELPOV100 variable, we use raw numbers instead of percentage, whi
 
 ## Ridge and LASSO Regression
 d)	Would it make sense to run Ridge or LASSO regression here? Explain briefly (~4-5 sentences) what these methods are, when they’re used, and why they would or would not be appropriate here.
+
+# **References**
+Economy League. (2023). Philadelphia’s Housing Cost-burden: A Pre- and Post-Pandemic Comparison.https://www.economyleague.org/resources/philadelphias-housing-cost-burden-pre-and-post-pandemic-comparison
