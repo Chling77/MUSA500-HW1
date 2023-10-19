@@ -109,6 +109,11 @@ Ordinary Least Squares (OLS) regression is a statistical technique to determine 
 We use regression analysis to determine the correlation between the dependent variable, which is the natural log of median house value, representing as LNMEDHVAL, and the predictors which are proportion of housing units that are vacant PCTVACANT, percent of housing units that are detached single family houses PCTSINGLES, proportion of residents in Block Group with at least a bachelor’s degree PCTBACHMOR, and the natural log of number of households that income below 100% poverty level LNNBELPOV100. Our equation is shown as follow:
 
 
+$$
+LNMEDHVAL = \beta_0 + \beta_1PCTVACANT\ + \beta_2PCTSINGLES + \beta_3PCTBACHMOR + \beta_4LNNBELPOV100 + \epsilon
+$$
+
+
 Where β0 is the y-intercept, interpreting the value of the dependent variable when the predictors are 0; β1, β2, β3, β4 are the slope coefficients of the predictors. 
 
 For a linear regression model, for any fixed value of independent variable x, there are parameters 𝛽0, 𝛽i, and 𝜎, where i = 1 in a simple regression and i>1 in a multiple regression, such that 𝑦 = 𝛽0 + 𝛽i𝑥i +𝜀, where 𝜀~𝑁(0, 𝜎2). The term 𝜀 is known as an error term or residual, and for each observation i, is defined as a vertical deviation (distance) between the observed value of y and the predicted value of y, denoted by ŷ. In addition, 𝜀~𝑁(0, 𝜎2) means that the error terms have a normal distribution with mean of 0 and variance 𝜎2. This holds for any given value of x, the average error term will be 0, and a typical deviation from the regression line will be 𝜎 units. 
@@ -122,29 +127,36 @@ No fewer than 10 observations per predictor.
 
 Given n observations on y, and k predictors x1 … xk, the estimates β0, β1, β2, …. βk are chosen simultaneously to minimize the expression for the Error Sum of Squares (SSE), given by:
 
+$$
+SSE=\sum_{i = 1}^{n}{\epsilon^2}=\sum_{i = 1}^{n}{(y - \hat{y})^2}=\sum_{i = 1}^{n}{(y_i-\hat{\beta_0}-\hat{\beta_1}x_1i-\hat{\beta_2}x_2i-...-\hat{\beta_k}x_ki)^2}
+$$
 
 where ŷ is the predicted y of the model, which equals to β0+β1x1+β2x2+.....+βkxk, with the minus sign before it would be demonstrated as the equation in the bracket. SSE represents the sum of squared error, or the sum of squared residuals ε, is the amount of variability in y that is not explained when accounting for x in the model. While there is another term SST, which means the total sum of squares, is demonstrated as the following equation: 
 
+$$
+SST=\sum_{i = 1}^{n}{(y_i-\bar{y})^2}=\sum_{i = 1}^{n}{(y_i-\frac{\sum_{i = 1}^{n}{y_i}}{n})^2}
+$$
+
 where Ӯ here represents the overall mean of y values, therefore SST is interpreted as the squared deviation of that observation from the overall mean of y, and then summing those squared deviations across all observations i, without any regard to the value of x. 
 
-
+$$
+\hat{\rho}=r=Corr(x,y)=\frac{\sum_{i = 1}^{n}{(x_i-\bar{x})(y_i-\bar{y})}}{\sqrt{\sum_{i = 1}^{n}{(x_i-\bar{x})^2}}{\sqrt{\sum_{i = 1}^{n}{(y_i-\bar{y})^2}}}}
+$$
 
 Sample correlation coefficient R is a point estimator of the population correlation 𝜌. 
 
 If we use the formula 1 – SSE/SST, we can get the coefficient of determination R2 which is the proportion of observed variation in the dependent variable y that was explained by the model, and always ranges between 0 and 1. 
 
 
-To assess our model, we examine the F-statistic and its corresponding p-value. The F-test, often referred to as the omnibus test, evaluates whether any of the independent variables in the model significantly predict the dependent variable. It tests the null hypothesis that none of the independent variables are significant predictors against the alternative hypothesis that at least one of them is. A model that fails to reject the null hypothesis is typically considered less effective. We then focus on the p-value associated with each independent variable. If the p-value for a specific independent variable is below 0.05, we can reject the null hypothesis, indicating that this particular predictor significantly influences the dependent variable. In this case, our null hypothesis, or H0 is that the correlation coefficient ρ equals to zero, and alternative  hypothesis or Ha states that the correlation coefficient ρ does not equal to zero, demonstrating as H0: ρ=0 and Ha: ρ≠0; 
+To assess our model, we examine the F-statistic and its corresponding p-value. The F-test, often referred to as the omnibus test, evaluates whether any of the independent variables in the model significantly predict the dependent variable. It tests the null hypothesis that none of the independent variables are significant predictors against the alternative hypothesis that at least one of them is. A model that fails to reject the null hypothesis is typically considered less effective. We then focus on the p-value associated with each independent variable. If the p-value for a specific independent variable is below 0.05, we can reject the null hypothesis, indicating that this particular predictor significantly influences the dependent variable. In this case, our null hypothesis, or H0 is that the coefficient β equals to zero, and alternative  hypothesis or Ha states that the coefficient β does not equal to zero, demonstrating as H0: β=0 and Ha: β≠0; 
 
 
 ## **Additional Analyses**
 
-To further test the relationship between median house values and studied neighborhood characteristic, we also run the stepwise regression. Stepwise regression is a statistical method that allows us to understand the statistical relationship between independent and dependent variables. The process of stepwise regression screens candidate variables and automatically identifies influential variables. In this scenario, stepwise regression is used to examine the statistical relationship between the dependent variable (MEDHVAL), and predictors (PCBACHMORE, NBELPOV100, PCTVACANT, and PCTSINGLES) based on the Akaike Information Criterion (a mathematical method for evaluating how well a model fits the data it was generated from). To be more specific, the algorithm adds or removes predictors to see if there is a significant change in the model fit determined by the AIC value and retain all predictors resulting in significant changes. However, there are limitations as well. Firstly, stepwise regression often leads to overfitting. To be more specific, sometimes the training data size is too small and does not contain enough data samples to accurately represent all possible input data values, leading to poor generalization to new dataset. Furthermore, rather than relying on professional knowledge, the model relies on an automatic process of selecting predictive variables. Therefore, it may overlook a more comprehensive model.
+Stepwise regression is a statistical method that allows us to understand the statistical relationship between independent and dependent variables. The process of stepwise regression screens candidate variables and automatically identifies influential variables. In this scenario, stepwise regression is used to examine the statistical relationship between the dependent variable (MEDHVAL) and predictors (PCBACHMORE, NBELPOV100, PCTVACANT, and PCTSINGLES) based on the Akaike Information Criterion (a mathematical method for evaluating how well a model fits the data it was generated from). Specifically, the algorithm adds or removes predictors to see if there is a significant change in the model fit determined by the AIC value and retains all predictors resulting in substantial changes. However, there are limitations as well. Firstly, stepwise regression often leads to overfitting. To be more specific, sometimes the training data size is too small and needs more data samples to accurately represent all possible input data values, leading to poor generalization to new datasets. Furthermore, rather than relying on professional knowledge, the model relies on an automatic process of selecting predictive variables. Therefore, it may need to look into a more comprehensive model.
 
 
-
-
-To test the problem of overfitting, we implement the K-fold cross-validation, a method used for evaluating the model performance. To be more specific, in this scenario(k=5), the sample dataset is randomly divided into five folds for training and validation. During each run, one-fold is selected for validation, and the rest are used for training and further iterations. This process is repeated five times, each with a different fold serving as the validation set and the other four as the training set. After this process, we will get five different performance values for each fold, the average of which serves as a holistic performance metric to determine how generalizable our model is. In this scenario, we will use the root mean squared error (RMSE) as the referencing performance value to evaluate the model’s performance. The RMSE measures the average magnitude of errors between the predicted and observed values in a dataset. In other words, it tells us the standard deviation of the residuals (prediction errors).
+The K-fold cross-validation is a method used for evaluating the performance of the regression model. In this scenario(k=5), the sample dataset is randomly divided into five folds for training and validation. During each run, one-fold is selected for validation, and the rest are used for training and further iterations. This process is repeated five times, each with a different fold serving as the validation set and the other four as the training set. After this process, we will get five different performance values for each fold, the average of which serves as a holistic performance metric to determine how generalizable our model is. In this scenario, we will use the root mean squared error (RMSE) as the referencing performance value to evaluate the model’s performance. The RMSE measures the average magnitude of errors between the predicted and observed values in a dataset. In other words, it tells us the standard deviation of the residuals (prediction errors).
 
 Turning to the discussion of the formula of the RMSE calculation, firstly, we need to get the SSE. In the formula below,  Xi stands for the observed values, Xn stands for the corresponding predicted values. The SSE is calculated as: 
 
@@ -162,7 +174,7 @@ RMSE =\sqrt{\frac{\sum_{i = 1}^{n}{(x_i- x_n )^2}}{n}}
 $$
 
 ## **Software**
-The software we is R Studio.
+
 
 # **Results**
 
@@ -234,7 +246,7 @@ hist(LNPCTSINGLES, breaks = 50)
 
 From the new histograms, we can see that LNPCTBACHMOR, LNPCTVACANT, LNPCTSINGLES are all having zero inflation, which means that there are very high frequency of zero values in the histograms after log transformation. Keep that in mind, we will only use log Median House Value presented as LNMEDHVAL (dependent variable), and log Number of Household living in Poverty LNNBELPV100 (one predictor) for the following regression analysis, while keep the other three variables original. 
 
-Other assumptions for linear regression including checking the linear relationship between dependent variable y and each of the predictors x, homoscedasticity of the variance of residuals, independence of observations, and multicollinearity will also be examined in the following sections. 
+Other assumptions for linear regression including checking the linear relationship between dependent variable y and each of the predictors x, homoscedasticity of the variance of residuals, independence of observations, and multicollinearity will also be examined in the following section 3.3 
 
 ### Choropleth maps
 
@@ -266,7 +278,6 @@ Plot2 <- ggplot(data_geom) +
        caption ="Figure 2")+
   mapTheme()
 
-Plot2
 ```
 
 ```{r fig.height=6, fig.width=8}
@@ -281,7 +292,6 @@ Plot3<- ggplot(data_geom) +
        caption ="Figure 3")+
   mapTheme()
 
-Plot3
 ```
 
 ```{r fig.height=6, fig.width=8}
@@ -296,7 +306,6 @@ Plot4 <- ggplot(data_geom) +
        caption ="Figure 4")+
   mapTheme()
 
-Plot4
 ```
 
 ```{r fig.height=6, fig.width=8}
@@ -311,7 +320,6 @@ Plot5 <- ggplot(data_geom) +
        caption ="Figure 5")+
   mapTheme()
 
-Plot5
 ```
 
 ```{r fig.height=12, fig.width=16}
@@ -374,15 +382,6 @@ Finally, the multiple R-square(0.6623) indicates that approximately 66.23% of th
 
 
 ```{r}
-# first clean the data
-any(is.infinite(LNNBELPOV100))
-# replace inf value to NA
-LNNBELPOV100[is.infinite(LNNBELPOV100)] <- NA
-# then replace na value to 0
-LNNBELPOV100[is.na(LNNBELPOV100)] <- 0
-```
-
-```{r}
 # run the 'lm' function
 lm1 <- lm(LNMEDHVAL ~ PCTVACANT + PCTSINGLES + PCTBACHMOR + LNNBELPOV, 
           data=data_cor)
@@ -398,14 +397,6 @@ summary(lm1)
 anova(lm1)
 ```
 
-
-$$
-Y \sim X\beta_0 + X\beta_1 + \epsilon
-$$
-
-$$
-\epsilon \sim N(0,\sigma^2)
-$$
 
 ## **Regression Assumption Checks**
 
@@ -508,24 +499,24 @@ step$anova
 
 K-fold model
 
-```{r}
+```{r include=FALSE}
 #Original model,set.seed(125)
 fit1 <- lm(LNMEDHVAL~ PCTBACHMOR + PCTVACANT + PCTSINGLES + LNNBELPOV, data=data_cor)
-#summary(fit1)
+summary(fit1)
 cv <- CVlm(data = data_cor, fit1, m=5)
 mse <- attr(cv, "ms")
 rmse <- sqrt(mse)			#Obtaining RMSE for model 1
-#rmse
+rmse
 ```
 
-```{r}
+```{r include=FALSE}
 #model2
 fit2 <- lm(LNMEDHVAL~ PCTVACANT + MEDHHINC, data=data_geom)
-#summary(fit2)
+summary(fit2)
 cv <- CVlm(data=st_drop_geometry(data_geom), fit2, m=5)
 mse <- attr(cv, "ms")
 rmse <- sqrt(mse)				#Obtaining RMSE for model 2
-#rmse
+rmse
 ```
 
 # **Discussion and Limitations**
