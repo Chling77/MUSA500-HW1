@@ -406,11 +406,12 @@ As we can see from the scatter plots, none of the relationships between the depe
 
 ```{r}
 # create a plotting window with 2*2 array
-par(mfrow=c(2,2))
-ggplot(data_cor, aes(x=LNNBELPOV, y=LNMEDHVAL)) + geom_point()
-ggplot(data_cor, aes(x=PCTBACHMOR, y=LNMEDHVAL)) + geom_point()
-ggplot(data_cor, aes(x=PCTVACANT, y=LNMEDHVAL)) + geom_point()
-ggplot(data_cor, aes(x=PCTSINGLES, y=LNMEDHVAL)) + geom_point()
+# par(mfrow=c(2,2))
+scatter1 <- ggplot(data_cor, aes(x=LNNBELPOV, y=LNMEDHVAL)) + geom_point()
+scatter2 <- ggplot(data_cor, aes(x=PCTBACHMOR, y=LNMEDHVAL)) + geom_point()
+scatter3 <- ggplot(data_cor, aes(x=PCTVACANT, y=LNMEDHVAL)) + geom_point()
+scatter4 <- ggplot(data_cor, aes(x=PCTSINGLES, y=LNMEDHVAL)) + geom_point()
+plot_grid(scatter1,scatter2,scatter3,scatter4)
 ```
 
 
