@@ -25,7 +25,6 @@ knitr::opts_chunk$set(echo = TRUE,
 	warning = FALSE)
 ```
 
-
 ```{r setup2, include=FALSE, echo=FALSE, message=FALSE, warning=FALSE}
 knitr::opts_chunk$set()
 
@@ -35,22 +34,21 @@ library(DAAG)
 library(car)  #to calculate VIF
 library(MASS)
 library(rsq)
-#library(kableExtra)
 library(tidyverse) #for ggplot
 library(sf) #for maps
 library(cowplot) #for plotgrid
-library(classInt)#for jenks breaks
-#library(rgdal)
+#library(classInt)#for jenks breaks
 library(ggplot2)
 library(RColorBrewer)
-library(broom)
+#library(broom)
 library(r2symbols)
-library(lattice)
+#library(lattice)
+library(corrplot)
 
 options(scipen=999)
 
 data <- read.csv("https://raw.githubusercontent.com/Chling77/MUSA500-HW1/main/Data/RegressionData.csv")
-data_geom <-st_read("D:/00Penn-学习/MUSA500/HW 1/RegressionData_geom/RegressionData.shp")
+data_geom <-st_read("C:/Users/hangzh/Downloads/Lecture 1 - RegressionData.shp/RegressionData.shp")
 
 source("https://raw.githubusercontent.com/urbanSpatial/Public-Policy-Analytics-Landing/master/functions.r")
 
@@ -181,17 +179,8 @@ N of Households Living in Poverty.                  | 189.7709 | 164.3185
 % of Vacant Houses                                  | 11.28853 | 9.628472
 % of Single House Units                             | 9.226473 | 13.24925
 
-1a. using 'hist', 'mean', and 'sd' commands
+
 ```{r}
-# plot all the histograms
-hist(data$MEDHVAL, breaks = 50)
-hist(data$NBELPOV100, breaks = 50)
-hist(data$PCTBACHMOR, breaks = 50)
-hist(data$PCTVACANT, breaks = 50)
-hist(data$PCTSINGLES, breaks = 50)
-
-hists <- histogram( ~ MEDHVAL +PCTBACHMOR +PCTVACANT +PCTSINGLES  +NBELPOV100, layout=c(2,3), data = data, main='Distribution of Raw Variables', sub= 'Figure 1', col="#8C96C6", breaks = 50, scales='free') 
-
 # look at mean values in summary table
 summary(data)
 
@@ -202,13 +191,14 @@ sd(data$PCTBACHMOR)
 sd(data$PCTVACANT)
 sd(data$PCTSINGLES)
 ```
-## Histograms and Log Transformation
 
-Histograms above illustrate the distribution of the dependent variable and the four predictors, where all of these histograms are positively skewed. Consequently, we have applied Log transformation to the original variables to normalize their distributions. We have added 1 to the log-transformed data to avoid Log(0) which is undefined. Following that, we present new histograms depicting the distribution of the log transformed variables.
 
-1a. i. Put the result in a table
 
-1a. ii. using 'log' command to create 5 new variables
+### Histograms and Log Transformation
+
+Histograms below illustrate the distribution of the dependent variable and the four predictors, where all of these histograms are positively skewed. Consequently, we have applied Log transformation to the original variables to normalize their distributions. We have added 1 to the log-transformed data to avoid Log(0) which is undefined. Following that, we present new histograms depicting the distribution of the log transformed variables.
+
+
 ```{r}
 # create and name new log variables
 LNMEDHVAL <- log(data$MEDHVAL)
@@ -217,47 +207,34 @@ LNPCTBACHMOR <- log(data$PCTBACHMOR+1)
 LNPCTVACANT <- log(data$PCTVACANT+1)
 LNPCTSINGLES <- log(data$PCTSINGLES+1)
 ```
-MEDHVAL, BELPOV100: use log
+MEDHVAL, NBELPOV100: use log
 other independent variables: use original variables
 
-plot new histograms
+```{r}
+# plot all the histograms
+hist(data$MEDHVAL, breaks = 50)
+par(mfrow=c(2,2))
+hist(data$NBELPOV100, breaks = 50)
+hist(data$PCTBACHMOR, breaks = 50)
+hist(data$PCTVACANT, breaks = 50)
+hist(data$PCTSINGLES, breaks = 50)
+```
+
 ```{r}
 # plot all the histograms for new log variables
 hist(LNMEDHVAL, breaks = 50)
+par(mfrow=c(2,2))
 hist(LNNBELPOV100, breaks = 50)
 hist(LNPCTBACHMOR, breaks = 50)
 hist(LNPCTVACANT, breaks = 50)
 hist(LNPCTSINGLES, breaks = 50)
-
-LNhists <- histogram( ~ LNMEDHVAL +LNPCTBACHMOR +LNPCTVACANT +LNPCTSINGLES  +LNNBELPOV100, layout=c(2,3), data = data, main='Distribution of Natural Log of Variables', sub= 'Figure 2', col="#B5C7F4", breaks = 50, scales='free') 
 ```
 
-From the new histograms, we can see that LNPCTBACHMOR, LNPCTVACANT, LNPCTSINGLES are all having zero inflations, which means that there are very high zero/low value bar in the histograms after log transformation. Keep that in mind, we will ony use Log Median House Value LNMEDHVAL, and Log Number of Household living in Poverty LNNBELPV100 for the following regression analysis, while keep the other three variables orginial. 
+From the new histograms, we can see that LNPCTBACHMOR, LNPCTVACANT, LNPCTSINGLES are all having zero inflation, which means that there are very high frequency of zero values in the histograms after log transformation. Keep that in mind, we will only use log Median House Value presented as LNMEDHVAL (dependent variable), and log Number of Household living in Poverty LNNBELPV100 (one predictor) for the following regression analysis, while keep the other three variables original. 
 
-1c. Look at the Pearson Correlations
-```{r}
-# correlation matrix
-data_cor <- data_geom %>%
-  dplyr::select(LNMEDHVAL, LNNBELPOV, PCTBACHMOR, PCTVACANT, PCTSINGLES) %>%
-  st_drop_geometry()
+Other assumptions for linear regression including checking the linear relationship between dependent variable y and each of the predictors x, homoscedasticity of the variance of residuals, independence of observations, and multicollinearity will also be examined in the following sections. 
 
-cor(data_cor, method=c("pearson"))
-```
-
-Look at multicollinearity (exclude the dependent variable in the correlation matrix)
-```{r}
-# correlation matrix
-data_cor_dependent <- data_geom %>%
-  dplyr::select(LNNBELPOV, PCTBACHMOR, PCTVACANT, PCTSINGLES) %>%
-  st_drop_geometry()
-
-cor(data_cor_dependent, method=c("pearson"))
-```
-
-
-only **LNMEDHVAL** map should be one single figure
-the other four should be in one figure with four maps
-
+### Choropleth maps
 
 ```{r fig.height=6, fig.width=8}
 # plot the choropleth graph for Median House Value
@@ -345,6 +322,33 @@ mapgrid <- plot_grid( Plot2,
 
 mapgrid
 ```
+
+
+### Correlation Matrix
+```{r}
+# correlation matrix
+data_cor <- data_geom %>%
+  dplyr::select(LNMEDHVAL, LNNBELPOV, PCTBACHMOR, PCTVACANT, PCTSINGLES) %>%
+  st_drop_geometry()
+
+cor_matrix <- cor(data_cor, method=c("pearson"))
+cor_matrix
+corrplot(cor_matrix)
+```
+
+Look at multicollinearity (exclude the dependent variable in the correlation matrix)
+```{r}
+# correlation matrix
+data_cor_dependent <- data_geom %>%
+  dplyr::select(LNNBELPOV, PCTBACHMOR, PCTVACANT, PCTSINGLES) %>%
+  st_drop_geometry()
+
+cor(data_cor_dependent, method=c("pearson"))
+```
+
+
+only **LNMEDHVAL** map should be one single figure
+the other four should be in one figure with four maps
 
 
 ## **Regression Results**
@@ -505,21 +509,21 @@ K-fold model
 ```{r}
 #Original model,set.seed(125)
 fit1 <- lm(LNMEDHVAL~ PCTBACHMOR + PCTVACANT + PCTSINGLES + LNNBELPOV, data=data_cor)
-summary(fit1)
+#summary(fit1)
 cv <- CVlm(data = data_cor, fit1, m=5)
 mse <- attr(cv, "ms")
 rmse <- sqrt(mse)			#Obtaining RMSE for model 1
-rmse
+#rmse
 ```
 
 ```{r}
 #model2
 fit2 <- lm(LNMEDHVAL~ PCTVACANT + MEDHHINC, data=data_geom)
-summary(fit2)
+#summary(fit2)
 cv <- CVlm(data=st_drop_geometry(data_geom), fit2, m=5)
 mse <- attr(cv, "ms")
 rmse <- sqrt(mse)				#Obtaining RMSE for model 2
-rmse
+#rmse
 ```
 
 # **Discussion and Limitations**
