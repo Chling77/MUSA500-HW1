@@ -48,11 +48,11 @@ library(corrplot)
 options(scipen=999)
 
 data <- read.csv("https://raw.githubusercontent.com/Chling77/MUSA500-HW1/main/Data/RegressionData.csv")
-data_geom <-st_read("C:/Users/hangzh/Downloads/Lecture 1 - RegressionData.shp/RegressionData.shp")
+data_geom <-st_read("/Users/hangzh/Downloads/Lecture 1 - RegressionData.shp/RegressionData.shp")
 
 source("https://raw.githubusercontent.com/urbanSpatial/Public-Policy-Analytics-Landing/master/functions.r")
 
-palette5 <- c("#f0f9e8","#bae4bc","#7bccc4","#43a2ca","#0868ac")
+palette5 <- c("#AED6F1","#85C1E9","#3498DB","#2874A6","#1B4F72")
 
 ```
 
@@ -226,12 +226,12 @@ other independent variables: use original variables
 
 ```{r}
 # plot all the histograms
-hist(data$MEDHVAL, breaks = 50)
+hist(data$MEDHVAL, main="Histogram of Median House Value", xlab="MEDHVAL",breaks = 50)
 par(mfrow=c(2,2))
-hist(data$NBELPOV100, breaks = 50)
-hist(data$PCTBACHMOR, breaks = 50)
-hist(data$PCTVACANT, breaks = 50)
-hist(data$PCTSINGLES, breaks = 50)
+hist(data$NBELPOV100, main="Histogram of Number of Poverty", xlab="NBELPOV100", breaks = 50)
+hist(data$PCTBACHMOR, main="Histogram of % of Bachelor Degrees", xlab="PCTBACHMOR", breaks = 50)
+hist(data$PCTVACANT, main="Histogram of % of Vacant Houses", xlab="PCTVACANT", breaks = 50)
+hist(data$PCTSINGLES, main="Histogram of % of Single House Units", xlab="PCTSINGLES",breaks = 50)
 ```
 
 ```{r}
@@ -255,7 +255,7 @@ Other assumptions for linear regression including checking the linear relationsh
 Plot1 <-ggplot(data_geom) +
   geom_sf(aes(fill = q5(LNMEDHVAL)),linewidth = 0.01) +
   scale_fill_manual(values = palette5,
-                    labels= newqBr(data_geom, "LNMEDHVAL"),
+                    #labels= newqBr(data_geom, "LNMEDHVAL"),
                     name = "LN Median House Value\n(Quintile Breaks)")+
   labs(title = "LN Median House Value in Philadelphia",
        subtitle = "Date Source: U.S. Census",
@@ -271,7 +271,7 @@ Plot1
 Plot2 <- ggplot(data_geom) +
   geom_sf(aes(fill = q5(LNNBELPOV)),linewidth = 0.01) +
   scale_fill_manual(values = palette5,
-                    labels= newqBr(data_geom, "LNNBELPOV"),
+                    #labels= newqBr(data_geom, "LNNBELPOV"),
                     name = "LN Households in Poverty\n(Quintile Breaks)")+
   labs(title = "LN number of households living in poverty in Philadelphia",
        subtitle = "Date Source: U.S. Census",
@@ -285,7 +285,7 @@ Plot2 <- ggplot(data_geom) +
 Plot3<- ggplot(data_geom) +
   geom_sf(aes(fill = q5(PCTVACANT)),linewidth = 0.01) +
   scale_fill_manual(values = palette5,
-                    labels= newqBr(data_geom, "PCTVACANT"),
+                    #labels= newqBr(data_geom, "PCTVACANT"),
                     name = "Precentage of Vacant housing units(%)\n(Quintile Breaks)")+
   labs(title = "Proportion of housing units that are vacant in Philadelphia",
        subtitle = "Date Source: U.S. Census",
@@ -299,7 +299,7 @@ Plot3<- ggplot(data_geom) +
 Plot4 <- ggplot(data_geom) +
   geom_sf(aes(fill = q5(PCTSINGLES)),linewidth = 0.01) +
   scale_fill_manual(values = palette5,
-                    labels= newqBr(data_geom, "PCTSINGLES"),
+                    #labels= newqBr(data_geom, "PCTSINGLES"),
                     name = "Precentage of housing units:\ndetached single family houses(%)\n(Quintile Breaks)")+
   labs(title = "Percent of housing units that are detached single family houses in Philadelphia",
        subtitle = "Date Source: U.S. Census",
@@ -313,7 +313,7 @@ Plot4 <- ggplot(data_geom) +
 Plot5 <- ggplot(data_geom) +
   geom_sf(aes(fill = q5(PCTBACHMOR)),linewidth = 0.01) +
   scale_fill_manual(values = palette5,
-                    labels= newqBr(data_geom, "PCTBACHMOR"),
+                    #labels= newqBr(data_geom, "PCTBACHMOR"),
                     name = "Precentage of residents:\nwith at least a bachelor's degree(%)\n(Quintile Breaks)")+
   labs(title = "Proportion of residents in Block Group with at least a bachelor’s degree in Philadelphia",
        subtitle = "Date Source: U.S. Census",
@@ -342,7 +342,6 @@ data_cor <- data_geom %>%
   st_drop_geometry()
 
 cor_matrix <- cor(data_cor, method=c("pearson"))
-cor_matrix
 corrplot(cor_matrix)
 ```
 
@@ -408,19 +407,19 @@ As we can see from the scatter plots, none of the relationships between the depe
 ```{r}
 # create a plotting window with 2*2 array
 par(mfrow=c(2,2))
-plot(data_cor$LNNBELPOV, data_cor$LNMEDHVAL)
-plot(data_cor$PCTBACHMOR, data_cor$LNMEDHVAL)
-plot(data_cor$PCTVACANT, data_cor$LNMEDHVAL)
-plot(data_cor$PCTSINGLES, data_cor$LNMEDHVAL)
+ggplot(data_cor, aes(x=LNNBELPOV, y=LNMEDHVAL)) + geom_point()
+ggplot(data_cor, aes(x=PCTBACHMOR, y=LNMEDHVAL)) + geom_point()
+ggplot(data_cor, aes(x=PCTVACANT, y=LNMEDHVAL)) + geom_point()
+ggplot(data_cor, aes(x=PCTSINGLES, y=LNMEDHVAL)) + geom_point()
 ```
 
 
-### Normality of residuals:
+### Normality of residuals
 Normality of residuals is important for point estimation, confidence intervals, and hypothesis tests only for small samples due to the central limit theorem. In our model, the number of observations reaches more than 1,400. Meanwhile, it's easy to notice from the histogram that most of the residuals are clustered around 0 and the trend seems to be normal.
 ```{r}
 #Residuals (and histogram of residuals)
 data_cor$resids <- residuals(lm1)
-hist(data_cor$resids)
+hist(data_cor$resids, main="Histogram of the standardized residuals", xlab="standardized Residuals", breaks = 20)
 ```
 
 
@@ -445,7 +444,8 @@ standardized <- rstandard(lm1)
 
 ```{r}
 # plot the standardized residuals versus predicted values scatter graph
-plot(fit, standardized)
+residual_predicted <- data.frame(x = fit, y = standardized)
+ggplot(residual_predicted, aes(x=fit, y=standardized)) + geom_point() + xlab("Predicted Values") + ylab("Standardized Residuals")
 ```
 
 
@@ -522,10 +522,10 @@ rmse
 ```
 
 # **Discussion and Limitations**
-## Recap - Hang
+## Conclusion
 Recap what you did in the paper and your findings. Discuss what conclusions you can draw, which variables were significant and whether that was surprising or not.
 
-## Model Quality - Jiahang
+## Model Quality
 The conducted analysis indicates that the regression model is a good one overall. Firstly, based on the regression results, the high F-statistic means that we can reject the null hypothesis that none of the independent variables in the model is a significant predictor of the dependent variable. Also, the multiple R-square (0.6623) indicates that approximately 66.23% of the variance in median house values can be explained by the model. The result of the stepwise regression further supports the strength of the model. Specifically, all predictors in the original model are retained in the final model, which means that the original model is the best model. All predictors have a statistically strong relationship with the dependent variable. Moreover, a cross-validation comparison reveals the original model's superiority. When considering all four variables, the model achieves a lower RMSE of 0.366, while a model based solely on 'housing vacancy' and 'median household income' has a higher RMSE of 0.443. This lower RMSE implies that the comprehensive model offers better predictive accuracy and alignment with actual values.
 
 This analysis confirms a robust relationship between median household value and factors including residents’ educational level, housing vacancy, the proportion of detached single-family houses, and number of households living in poverty. Specifically, housing vacancy rates and the percentage of detached single-family homes can be seen as reflections of housing quality and price trends. Meanwhile, poverty and education levels provide insight into the economic standing and purchasing power of potential homeowners.
@@ -534,12 +534,12 @@ While the current model is insightful, there is potential to enhance the model's
 
 
 
-## Results - Ling
+## Limitations
 
 In terms of the model's limitations, it's important to note that the relationships between predictors and the dependent variable are not strictly linear. Only the relationship between PCTBACHMOR and MEDHVAL appears to be relatively linear. This violation of linearity assumptions could potentially introduce bias into parameter estimates and result in inaccurate outcomes. While attempts were made to address this by transforming some predictors using logarithmic transformations, certain predictors still contain significant zero values, so they were retained in their original form. Additionally, some predictors are interrelated with each other; for instance, the percentage of residents with at least a bachelor's degree is negatively correlated with the poverty status. Furthermore, an examination of the residuals map reveals the presence of spatial autocorrelation, which could lead to inefficient parameter estimates. As such, addressing nonlinear relationships, correlated observations, and spatial autocorrelation is crucial when modeling this data.
  
 Also, for out NBELPOV100 variable, we use raw numbers instead of percentage, which might make it difficult to compare across different geographical regions or time periods, as it lacks contexts or normalization. And this may further lead to misleading interpretations of the predictor's effect. On the other hand, it's also challenging to explain the practical implications of changes in the number of households in poverty without considering the total population or percentage of poverty.
 
 
-## Explain the methods - Hang
+## Ridge and LASSO Regression
 d)	Would it make sense to run Ridge or LASSO regression here? Explain briefly (~4-5 sentences) what these methods are, when they’re used, and why they would or would not be appropriate here.
