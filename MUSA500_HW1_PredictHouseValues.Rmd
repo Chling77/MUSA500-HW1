@@ -48,7 +48,7 @@ library(corrplot)
 options(scipen=999)
 
 data <- read.csv("https://raw.githubusercontent.com/Chling77/MUSA500-HW1/main/Data/RegressionData.csv")
-data_geom <-st_read("/Users/hangzh/Downloads/Lecture 1 - RegressionData.shp/RegressionData.shp")
+data_geom <-st_read("/Users/hangzhao/Documents/R/Lecture 1 - RegressionData.shp/RegressionData.shp")
 
 source("https://raw.githubusercontent.com/urbanSpatial/Public-Policy-Analytics-Landing/master/functions.r")
 
@@ -119,11 +119,11 @@ Where β0 is the y-intercept, interpreting the value of the dependent variable w
 For a linear regression model, for any fixed value of independent variable x, there are parameters 𝛽0, 𝛽i, and 𝜎, where i = 1 in a simple regression and i>1 in a multiple regression, such that 𝑦 = 𝛽0 + 𝛽i𝑥i +𝜀, where 𝜀~𝑁(0, 𝜎2). The term 𝜀 is known as an error term or residual, and for each observation i, is defined as a vertical deviation (distance) between the observed value of y and the predicted value of y, denoted by ŷ. In addition, 𝜀~𝑁(0, 𝜎2) means that the error terms have a normal distribution with mean of 0 and variance 𝜎2. This holds for any given value of x, the average error term will be 0, and a typical deviation from the regression line will be 𝜎 units. 
 
 There are several assumptions we have to make prior to the linear regression. 
-Check the linearity of each predictors and the dependent variable by creating scatter plots. If no linearity can be observed from the plots, variable transformation or polynomial regression might be better. 
-Examine the normality of residuals by plotting out the histogram. If the histogram is not normally distributed, log transformation may be used to normalize both dependent variable and predictor. However, sometimes log transformation is not appropriate, especially when there is high zero inflations. 
-Confirm homoscedasticity, which means that the variance of residuals should be constant throughout the different values of x.
-Predictors should not be strongly correlated with each other, which is also called to prevent multicollinearity. 
-No fewer than 10 observations per predictor. 
+1. Check the linearity of each predictors and the dependent variable by creating scatter plots. If no linearity can be observed from the plots, variable transformation or polynomial regression might be better. 
+2. Examine the normality of residuals by plotting out the histogram. If the histogram is not normally distributed, log transformation may be used to normalize both dependent variable and predictor. However, sometimes log transformation is not appropriate, especially when there is high zero inflations. 
+3. Confirm homoscedasticity, which means that the variance of residuals should be constant throughout the different values of x.
+4. Predictors should not be strongly correlated with each other, which is also called to prevent multicollinearity. 
+5. No fewer than 10 observations per predictor. 
 
 Given n observations on y, and k predictors x1 … xk, the estimates β0, β1, β2, …. βk are chosen simultaneously to minimize the expression for the Error Sum of Squares (SSE), given by:
 
@@ -225,8 +225,7 @@ LNPCTBACHMOR <- log(data$PCTBACHMOR+1)
 LNPCTVACANT <- log(data$PCTVACANT+1)
 LNPCTSINGLES <- log(data$PCTSINGLES+1)
 ```
-MEDHVAL, NBELPOV100: use log
-other independent variables: use original variables
+
 
 ```{r}
 # plot all the histograms
@@ -357,7 +356,7 @@ cor_matrix <- cor(data_cor, method=c("pearson"))
 corrplot(cor_matrix)
 ```
 
-Look at multicollinearity (exclude the dependent variable in the correlation matrix)
+Look at multicollinearity (exclude the dependent variable in the correlation matrix table)
 ```{r}
 # correlation matrix
 data_cor_dependent <- data_geom %>%
@@ -366,10 +365,6 @@ data_cor_dependent <- data_geom %>%
 
 cor(data_cor_dependent, method=c("pearson"))
 ```
-
-
-only **LNMEDHVAL** map should be one single figure
-the other four should be in one figure with four maps
 
 
 ## **Regression Results**
@@ -547,7 +542,7 @@ rmse2
 
 In summary, we examined the relationship between median house values and several neighborhood characteristics using Philadelphia data at the Census block group level. More specifically, linear regression was done between the dependent variable MEDHVAL (Median House Values) and the predictors PCTBACHMOR (Percentage of Bachelor's Degree or Higher), NBELPOV100 (Number of Households living in Poverty), PCTVACANT (Percentage of Vacant Houses), and PCTSINGLES (Percentage of Single House Units). Due to the fact that all variables are positively skewed, we applied log transformation to each variable, and decided to use log MEDHVAL, and log NBELPOV100 in our model, because although all variables are normalized after log transformation, the other three variables are all having zero inflations, while NBELPOV100 and MEDHVAL do not have/have negligible frequency of zero values. 
 
-After that, regression assumptions were checked: multicollinearity, linear relationship between dependent variables and predictors, homoscedasticity of variance of residuals, and normality of residuals, where all the assumption requirements are successfully met in this model. The result of linear regression presented that all four predictors are significant with p values far less than 0.05, which means that the null hypothesis of the beta coefficient equals to zero can be rejected, and all four predictors are significantly correlated with the dependent variable LNMEDHVAL. Within those, predictor PCTBACHMOR (percentage of residents with at least a Bachelor's degree) demonstrates the most significant association to the LNMEDHVAL. 
+After that, regression assumptions were checked: multicollinearity, linear relationship between dependent variables and predictors, homoscedasticity of variance of residuals, and normality of residuals, where all the assumption requirements are successfully met in this model. The result of linear regression presented that all four predictors are significant with p values far less than 0.05, which means that the null hypothesis of the beta coefficient equals to zero can be rejected, and all four predictors are significantly correlated with the dependent variable LNMEDHVAL. Within those, predictor PCTBACHMOR demonstrates the most significant association to the LNMEDHVAL. 
 
 Finally we applied stepwise regression and k-fold cross-validation to further validate our result. Overall, all four predictors are kept in the stepwise regression, and the rmse value (root mean squared error) in our model is obviously lower than the rmse value in the model that only has PCTVACANT and MEDHHINC (Median household income) as predictors. Therefore, it validates that our model performs better. 
 
@@ -570,7 +565,7 @@ Also, for out NBELPOV100 variable, we use raw numbers instead of percentage, whi
 
 ## Ridge and LASSO Regression
 
-Ridge and LASSO regression are alternative regression techniques similar to each other that allow for multicollinearity, allow for larger number of predictors than observations, and deal with overfitting by shrinking the coefficient of variables to 0. However, both Ridge and LASSO regression will result in biased predicted values while the variance become lower, and they will increase the complexity of the model and the way of interpretation. The problem of Ridge regression is that all k predictors will be included, that is, it cannot perform variable selection. LASSO regression on the other hand can do variable selection, but still has other limitations. Normally, ridge/LASSO regression will be applied when there are severe multicollinearity, few observations relative to the number of predictors, or we would like a beter fit for unseen data than with OLS regression. In this case, as our model does not have the problem of multicollinearity and our number of observations are larger than number of predictors, we assume that it is unnecessary to perform those two regression methods here in this situation. 
+Ridge and LASSO regression are alternative regression techniques similar to each other that allow for multicollinearity, allow for larger number of predictors than observations, and deal with overfitting by shrinking the coefficient of variables to 0. However, both Ridge and LASSO regression will result in biased predicted values while the variance become lower, and they will increase the complexity of the model and the way of interpretation. The problem of Ridge regression is that all k predictors will be included, that is, it cannot perform variable selection. LASSO regression on the other hand can do variable selection, but still has other limitations. Normally, ridge/LASSO regression will be applied when there are severe multicollinearity, few observations relative to the number of predictors, or we would like a beter fit for unseen data than with OLS regression. In this case, as our model does not have the problem of multicollinearity and our number of observations are larger than number of predictors, we assume that it is unnecessary to perform those two regression methods. 
 
 
 # **References**
