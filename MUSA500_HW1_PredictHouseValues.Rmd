@@ -147,6 +147,10 @@ Sample correlation coefficient R is a point estimator of the population correlat
 
 If we use the formula 1 – SSE/SST, we can get the coefficient of determination R2 which is the proportion of observed variation in the dependent variable y that was explained by the model, and always ranges between 0 and 1. 
 
+$$
+R^2 = 1-\frac{SSE}{SST}
+$$
+
 
 To assess our model, we examine the F-statistic and its corresponding p-value. The F-test, often referred to as the omnibus test, evaluates whether any of the independent variables in the model significantly predict the dependent variable. It tests the null hypothesis that none of the independent variables are significant predictors against the alternative hypothesis that at least one of them is. A model that fails to reject the null hypothesis is typically considered less effective. We then focus on the p-value associated with each independent variable. If the p-value for a specific independent variable is below 0.05, we can reject the null hypothesis, indicating that this particular predictor significantly influences the dependent variable. In this case, our null hypothesis, or H0 is that the coefficient β equals to zero, and alternative  hypothesis or Ha states that the coefficient β does not equal to zero, demonstrating as H0: β=0 and Ha: β≠0; 
 
@@ -234,6 +238,11 @@ hist(data$PCTVACANT, main="Histogram of % of Vacant Houses", xlab="PCTVACANT", b
 hist(data$PCTSINGLES, main="Histogram of % of Single House Units", xlab="PCTSINGLES",breaks = 50)
 ```
 
+
+From the new histograms, we can see that LNPCTBACHMOR, LNPCTVACANT, LNPCTSINGLES are all having zero inflation, which means that there are very high frequency of zero values in the histograms after log transformation. Keep that in mind, we will only use log Median House Value presented as LNMEDHVAL (dependent variable), and log Number of Household living in Poverty LNNBELPV100 (one predictor) for the following regression analysis, while keep the other three variables original. 
+
+Other assumptions for linear regression including checking the linear relationship between dependent variable y and each of the predictors x, homoscedasticity of the variance of residuals, independence of observations, and multicollinearity will also be examined in the following section 3.3 
+
 ```{r}
 # plot all the histograms for new log variables
 hist(LNMEDHVAL, breaks = 50)
@@ -244,11 +253,11 @@ hist(LNPCTVACANT, breaks = 50)
 hist(LNPCTSINGLES, breaks = 50)
 ```
 
-From the new histograms, we can see that LNPCTBACHMOR, LNPCTVACANT, LNPCTSINGLES are all having zero inflation, which means that there are very high frequency of zero values in the histograms after log transformation. Keep that in mind, we will only use log Median House Value presented as LNMEDHVAL (dependent variable), and log Number of Household living in Poverty LNNBELPV100 (one predictor) for the following regression analysis, while keep the other three variables original. 
-
-Other assumptions for linear regression including checking the linear relationship between dependent variable y and each of the predictors x, homoscedasticity of the variance of residuals, independence of observations, and multicollinearity will also be examined in the following section 3.3 
-
 ### Choropleth maps
+
+Choropleth maps of each variable, LNMEDHVAL, LNNBELPOV, PCTVACANT, PCTSINGLES, and PCTBACHMOR are presented below. We used 5 quantile breaks as the map representation method. From the maps, we can see that there are clearly some overlaps between LNMEDHVAL map(Figure 1) and PCTBACHMOR map(Figure 5), showing strong correlation of the predictor % of Bachelor's Degree to the dependent variable Median House Value. Whereas the LNNBELPOV and PCTVACANT maps are having completely different patterns to the MEDHVAL map, illustrating very weak correlations. PCTSINGLES however, is presenting partially similar pattern to the MEDHVAL, which may have some extent of correlation to the dependent variable. 
+
+Among the predictors, there are no obvious similarities between the maps, while LNNBELPOV does show a little overlap with the PCTVACANT, we do not expect there to be severe multicollinearity between the predictors. 
 
 ```{r fig.height=6, fig.width=8}
 # plot the choropleth graph for Median House Value
@@ -335,6 +344,9 @@ mapgrid
 
 
 ### Correlation Matrix
+
+Correlation matrix in graph and table is shown below. It is used to test multicollinearity between the predictors. Looking at the table, we can see that the greatest correlation coefficients between predictors are -0.31, 0.24, and -0.29, which are not strongly correlated. Therefore, no severe multicollinearity between the predictors has been observed, which aligns the expectations from previous map observations. 
+
 ```{r}
 # correlation matrix
 data_cor <- data_geom %>%
@@ -490,7 +502,7 @@ choro_stdreg
 
 ## **Additional Models**
 
-## using stepwise regression and determine the best model
+### using stepwise regression and determine the best model
 As is depicted in the result of the stepwise model, all 4 predictors in the original model are retained in the final model. To be more specific, compared with other models with some of the variables dropped, the original has the smallest AIC, -3448.16, indicating that the original model does the best prediction. 
 
 ```{r}
@@ -500,31 +512,45 @@ step <- stepAIC(best_model, direction="both")
 step$anova
 ```
 
-## K-fold model
+### K-fold model
 After performing cross-validation on the models, we obtained the following results: the RMSE for the original regression model stands at 0.366, while the secondary model has an RMSE of 0.443.
 ```{r include=FALSE}
 #Original model,set.seed(125)
 fit1 <- lm(LNMEDHVAL~ PCTBACHMOR + PCTVACANT + PCTSINGLES + LNNBELPOV, data=data_cor)
 summary(fit1)
-cv <- CVlm(data = data_cor, fit1, m=5)
-mse <- attr(cv, "ms")
-rmse <- sqrt(mse)			#Obtaining RMSE for model 1
-rmse
+cv1 <- CVlm(data = data_cor, fit1, m=5)
+mse1 <- attr(cv1, "ms")
+rmse1 <- sqrt(mse1)			#Obtaining RMSE for model 1
 ```
+
+```{r}
+rmse1
+```
+
 
 ```{r include=FALSE}
 #model2
 fit2 <- lm(LNMEDHVAL~ PCTVACANT + MEDHHINC, data=data_geom)
 summary(fit2)
-cv <- CVlm(data=st_drop_geometry(data_geom), fit2, m=5)
-mse <- attr(cv, "ms")
-rmse <- sqrt(mse)				#Obtaining RMSE for model 2
-rmse
+cv2 <- CVlm(data=st_drop_geometry(data_geom), fit2, m=5)
+mse2 <- attr(cv2, "ms")
+rmse2 <- sqrt(mse2)				#Obtaining RMSE for model 2
 ```
+
+```{r}
+rmse2
+```
+
 
 # **Discussion and Limitations**
 ## Conclusion
-Recap what you did in the paper and your findings. Discuss what conclusions you can draw, which variables were significant and whether that was surprising or not.
+
+In summary, we examined the relationship between median house values and several neighborhood characteristics using Philadelphia data at the Census block group level. More specifically, linear regression was done between the dependent variable MEDHVAL (Median House Values) and the predictors PCTBACHMOR (Percentage of Bachelor's Degree or Higher), NBELPOV100 (Number of Households living in Poverty), PCTVACANT (Percentage of Vacant Houses), and PCTSINGLES (Percentage of Single House Units). Due to the fact that all variables are positively skewed, we applied log transformation to each variable, and decided to use log MEDHVAL, and log NBELPOV100 in our model, because although all variables are normalized after log transformation, the other three variables are all having zero inflations, while NBELPOV100 and MEDHVAL do not have/have negligible frequency of zero values. 
+
+After that, regression assumptions were checked: multicollinearity, linear relationship between dependent variables and predictors, homoscedasticity of variance of residuals, and normality of residuals, where all the assumption requirements are successfully met in this model. The result of linear regression presented that all four predictors are significant with p values far less than 0.05, which means that the null hypothesis of the beta coefficient equals to zero can be rejected, and all four predictors are significantly correlated with the dependent variable LNMEDHVAL. Within those, predictor PCTBACHMOR (percentage of residents with at least a Bachelor's degree) demonstrates the most significant association to the LNMEDHVAL. 
+
+Finally we applied stepwise regression and k-fold cross-validation to further validate our result. Overall, all four predictors are kept in the stepwise regression, and the rmse value (root mean squared error) in our model is obviously lower than the rmse value in the model that only has PCTVACANT and MEDHHINC (Median household income) as predictors. Therefore, it validates that our model performs better. 
+
 
 ## Model Quality
 The conducted analysis indicates that the regression model is a good one overall. Firstly, based on the regression results, the high F-statistic means that we can reject the null hypothesis that none of the independent variables in the model is a significant predictor of the dependent variable. Also, the multiple R-square (0.6623) indicates that approximately 66.23% of the variance in median house values can be explained by the model. The result of the stepwise regression further supports the strength of the model. Specifically, all predictors in the original model are retained in the final model, which means that the original model is the best model. All predictors have a statistically strong relationship with the dependent variable. Moreover, a cross-validation comparison reveals the original model's superiority. When considering all four variables, the model achieves a lower RMSE of 0.366, while a model based solely on 'housing vacancy' and 'median household income' has a higher RMSE of 0.443. This lower RMSE implies that the comprehensive model offers better predictive accuracy and alignment with actual values.
@@ -543,7 +569,9 @@ Also, for out NBELPOV100 variable, we use raw numbers instead of percentage, whi
 
 
 ## Ridge and LASSO Regression
-d)	Would it make sense to run Ridge or LASSO regression here? Explain briefly (~4-5 sentences) what these methods are, when they’re used, and why they would or would not be appropriate here.
+
+Ridge and LASSO regression are alternative regression techniques similar to each other that allow for multicollinearity, allow for larger number of predictors than observations, and deal with overfitting by shrinking the coefficient of variables to 0. However, both Ridge and LASSO regression will result in biased predicted values while the variance become lower, and they will increase the complexity of the model and the way of interpretation. The problem of Ridge regression is that all k predictors will be included, that is, it cannot perform variable selection. LASSO regression on the other hand can do variable selection, but still has other limitations. Normally, ridge/LASSO regression will be applied when there are severe multicollinearity, few observations relative to the number of predictors, or we would like a beter fit for unseen data than with OLS regression. In this case, as our model does not have the problem of multicollinearity and our number of observations are larger than number of predictors, we assume that it is unnecessary to perform those two regression methods here in this situation. 
+
 
 # **References**
-Economy League. (2023). Philadelphia’s Housing Cost-burden: A Pre- and Post-Pandemic Comparison.https://www.economyleague.org/resources/philadelphias-housing-cost-burden-pre-and-post-pandemic-comparison
+Economy League. (2023). Philadelphia’s Housing Cost-burden: A Pre- and Post-Pandemic Comparison. https://www.economyleague.org/resources/philadelphias-housing-cost-burden-pre-and-post-pandemic-comparison 
