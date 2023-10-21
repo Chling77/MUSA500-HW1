@@ -4,19 +4,13 @@ title: 'MUSA500 Homework 1: Using OLS Regression to Predict Median House Values 
 author: "Ling Chen, Hang Zhao, Jiahang Li"
 date: "2023-10-16"
 output:
-  html_document:
-    toc: yes
-    toc_float: yes
-    code_folding: hide
-    number_sections: yes
-    code_download: no
-    theme: united
-    highlight: espresso
   pdf_document:
     toc: yes
-editor_options:
-  markdown:
-    wrap: 72
+    latex_engine: xelatex
+    pandoc_args: ["--pdf-engine-opt=-shell-escape"]
+header-includes:
+  - "\\usepackage[utf8]{inputenc}"
+      
 ---
 
 ```{r setup, include=FALSE}
@@ -48,7 +42,7 @@ library(corrplot)
 options(scipen=999)
 
 data <- read.csv("https://raw.githubusercontent.com/Chling77/MUSA500-HW1/main/Data/RegressionData.csv")
-data_geom <-st_read("/Users/hangzhao/Documents/R/Lecture 1 - RegressionData.shp/RegressionData.shp")
+data_geom <-st_read("D:/00Penn-学习/MUSA500/HW 1/RegressionData_geom/RegressionData.shp")
 
 source("https://raw.githubusercontent.com/urbanSpatial/Public-Policy-Analytics-Landing/master/functions.r")
 
@@ -56,7 +50,7 @@ palette5 <- c("#AED6F1","#85C1E9","#3498DB","#2874A6","#1B4F72")
 
 ```
 
-```{r, warning = FALSE, message = FALSE}
+```{r message=FALSE, warning=FALSE, include=FALSE}
 newqBr <- function(df, variable, rnd) {
   if (missing(rnd)) {
     as.character(quantile(round(df[[variable]],4),
@@ -217,7 +211,7 @@ sd(data$PCTSINGLES)
 The histograms below illustrate the distribution of the dependent variable and the four predictors, where all of these histograms are positively skewed. Consequently, we have applied Log transformation to the original variables to normalize their distributions. We have added 1 to the log-transformed data to avoid Log(0) which is undefined. Following that, we present new histograms depicting the distribution of the log-transformed variables.
 
 
-```{r}
+```{r include=FALSE}
 # create and name new log variables
 LNMEDHVAL <- log(data$MEDHVAL)
 LNNBELPOV100 <- log(data$NBELPOV100+1)
@@ -227,7 +221,7 @@ LNPCTSINGLES <- log(data$PCTSINGLES+1)
 ```
 
 
-```{r}
+```{r echo=FALSE}
 # plot all the histograms
 hist(data$MEDHVAL, main="Histogram of Median House Value", xlab="MEDHVAL",breaks = 50)
 par(mfrow=c(2,2))
@@ -242,7 +236,7 @@ From the new histograms, we can see that LNPCTBACHMOR, LNPCTVACANT, LNPCTSINGLES
 
 Other assumptions for linear regression including checking the linear relationship between dependent variable y and each of the predictors x, homoscedasticity of the variance of residuals, independence of observations, and multicollinearity will also be examined in the following section 3.3 
 
-```{r}
+```{r echo=FALSE, fig.height=6, fig.width=8}
 # plot all the histograms for new log variables
 hist(LNMEDHVAL, breaks = 50)
 par(mfrow=c(2,2))
@@ -258,7 +252,7 @@ Choropleth maps of each variable, LNMEDHVAL, LNNBELPOV, PCTVACANT, PCTSINGLES, a
 
 Among the predictors, there are no obvious similarities between the maps, while LNNBELPOV does show a little overlap with the PCTVACANT, we do not expect there to be severe multicollinearity between the predictors. 
 
-```{r fig.height=6, fig.width=8}
+```{r echo=FALSE, fig.height=6, fig.width=8}
 # plot the choropleth graph for Median House Value
 Plot1 <-ggplot(data_geom) +
   geom_sf(aes(fill = q5(LNMEDHVAL)),linewidth = 0.01) +
@@ -274,7 +268,7 @@ Plot1
 ```
 
 
-```{r fig.height=6, fig.width=8}
+```{r fig.height=6, fig.width=8, include=FALSE}
 # plot the choropleth graph for LN number of households living in poverty
 Plot2 <- ggplot(data_geom) +
   geom_sf(aes(fill = q5(LNNBELPOV)),linewidth = 0.01) +
@@ -288,7 +282,7 @@ Plot2 <- ggplot(data_geom) +
 
 ```
 
-```{r fig.height=6, fig.width=8}
+```{r fig.height=6, fig.width=8, include=FALSE}
 # plot the choropleth graph for Proportion of housing units that are vacant
 Plot3<- ggplot(data_geom) +
   geom_sf(aes(fill = q5(PCTVACANT)),linewidth = 0.01) +
@@ -302,7 +296,7 @@ Plot3<- ggplot(data_geom) +
 
 ```
 
-```{r fig.height=6, fig.width=8}
+```{r fig.height=6, fig.width=8, include=FALSE}
 # plot the choropleth graph for Percent of housing units that are detached single family houses
 Plot4 <- ggplot(data_geom) +
   geom_sf(aes(fill = q5(PCTSINGLES)),linewidth = 0.01) +
@@ -316,7 +310,7 @@ Plot4 <- ggplot(data_geom) +
 
 ```
 
-```{r fig.height=6, fig.width=8}
+```{r fig.height=6, fig.width=8, include=FALSE}
 # plot the choropleth graph for Proportion of residents in Block Group with at least a bachelor’s degree
 Plot5 <- ggplot(data_geom) +
   geom_sf(aes(fill = q5(PCTBACHMOR)),linewidth = 0.01) +
@@ -330,7 +324,7 @@ Plot5 <- ggplot(data_geom) +
 
 ```
 
-```{r fig.height=12, fig.width=16}
+```{r echo=FALSE, fig.height=12, fig.width=16}
 mapgrid <- plot_grid( Plot2, 
                       Plot3, 
                       Plot4, 
@@ -346,7 +340,7 @@ mapgrid
 
 The correlation matrix in the graph and table is shown below. It is used to test multicollinearity between the predictors. The table shows that the greatest correlation coefficients between predictors are -0.31, 0.24, and -0.29, which are not strongly correlated. Therefore, no severe multicollinearity between the predictors has been observed, which aligns with the expectations from previous map observations. 
 
-```{r}
+```{r echo=FALSE, fig.height=4, fig.width=4}
 # correlation matrix
 data_cor <- data_geom %>%
   dplyr::select(LNMEDHVAL, LNNBELPOV, PCTBACHMOR, PCTVACANT, PCTSINGLES) %>%
@@ -357,7 +351,7 @@ corrplot(cor_matrix)
 ```
 
 Look at multicollinearity (exclude the dependent variable in the correlation matrix table)
-```{r}
+```{r echo=FALSE}
 # correlation matrix
 data_cor_dependent <- data_geom %>%
   dplyr::select(LNNBELPOV, PCTBACHMOR, PCTVACANT, PCTSINGLES) %>%
@@ -382,7 +376,7 @@ Secondly, the coefficients for each predictor variable also provide some insight
 Notably, a higher percentage of vacant housing units(PCTVACANT) is associated with a significant decrease in median house values, indicating the negative impact of housing vacancy on property values. That is to say, a 1% additional proportion of vacant housing units is associated with a \$19 decrease in median house values. 
 In addition, a higher number of households with incomes below 100% of the poverty level(LNNBELPOV) is associated with a significant decrease in median house values as well. As the number of households in poverty changes by 1%, the expected value of median house values changes by $(1.01^{\beta_1} - 1)*100 = (1.01^{-.079} - 1) * 100 = -0.0786 \%$
 Conversely, the percentage of housing units that are detached single-family houses(PCTSINGLES) has a strong positive relationship with house values. 1% additional percentage of housing units that are detached single-family houses is associated with a \$3 increase in median house values.
-Also, a higher proportion of residents with at least a bachelor's degree(PCTBACHMOR) exhibits a strong positive relationship with house values, showing that areas with a well-educated population tend to have higher property values. Specifically, the expected change in median house values associated with 1 additional percentage of residents who has at least a bachelor's degree is $(1.01^{\beta_1} - 1)*100 = (1.01^{.021} - 1) * 100 = 0.0209 \%$ 
+Also, a higher proportion of residents with at least a bachelor's degree(PCTBACHMOR) exhibits a strong positive relationship with house values, showing that areas with a well-educated population tend to have higher property values. Specifically, the expected change in median house values associated with 1 additional percentage of residents who has at least a bachelor's degree is $(1.01^{\beta_1} - 1)*100*(\$1000) = (1.01^{.021} - 1) * 100 *(\$1000)= \$20.9$ 
 Finally, the multiple R-square(0.6623) indicates that approximately 66.23% of the variance in median house values can be explained by the model. The adjusted R-squared further takes into account the number of predictors in the model, which is 66.15% in this case.
 
 
@@ -410,7 +404,7 @@ In this section, we'll be talking about testing model assumptions. Through the e
 ### Model Assumptions: Linearity
 As we can see from the scatter plots, none of the relationships between the dependent variable (LNMEDHVAL) and each of the predictors appear to be strictly linear. Except for the relationship between median home value (LNMEDHVAL) and the percentage of residents with at least a bachelor's degree (PCTBACHMOR) which seems to be the most linear. The other scatter plots show data points either concentrated in the center or the lower left corner. Thus, with the exception of the relationship between LNMEDHVAL and PCTBACHMOR, the relationships between the dependent variable and most of the predictors deviate significantly from the assumption of strict linearity.
 
-```{r}
+```{r echo=FALSE}
 # create a plotting window with 2*2 array
 # par(mfrow=c(2,2))
 scatter1 <- ggplot(data_cor, aes(x=LNNBELPOV, y=LNMEDHVAL)) + geom_point()
@@ -423,7 +417,8 @@ plot_grid(scatter1,scatter2,scatter3,scatter4)
 
 ### Normality of residuals
 The normality of residuals is important for point estimation, confidence intervals, and hypothesis tests only for small samples due to the central limit theorem. In our model, the number of observations reaches more than 1,400. Meanwhile, it's easy to notice from the histogram that most of the residuals are clustered around 0 and the trend seems to be normal.
-```{r}
+
+```{r echo=FALSE, fig.height=6, fig.width=8}
 #Residuals (and histogram of residuals)
 data_cor$resids <- residuals(lm1)
 hist(data_cor$resids, main="Histogram of the standardized residuals", xlab="standardized Residuals", breaks = 20)
@@ -442,14 +437,14 @@ By examining the 'Standardized Residual by Predicted Value' scatter plot, the go
 
 Additionally, some points lie further from the dense cluster, potentially indicating outliers. These extremely standardized residuals can influence model estimates and might warrant further investigation.
 
-```{r}
+```{r include=FALSE}
 # run 'fitted', 'residuals', and 'standardized' functions
 fit <- fitted(lm1)
 SSE <- residuals(lm1)
 standardized <- rstandard(lm1)
 ```
 
-```{r}
+```{r echo=FALSE, fig.height=6, fig.width=8}
 # plot the standardized residuals versus predicted values scatter graph
 residual_predicted <- data.frame(x = fit, y = standardized)
 ggplot(residual_predicted, aes(x=fit, y=standardized)) + geom_point() + xlab("Predicted Values") + ylab("Standardized Residuals")
@@ -460,7 +455,7 @@ ggplot(residual_predicted, aes(x=fit, y=standardized)) + geom_point() + xlab("Pr
 
 Observing the maps of the dependent variable and the predictors, there's a discernible spatial autocorrelation between the median house values and the percentage of residents holding at least a bachelor's degree. Prominent clusters of higher values can be identified in the northwest, northeast, center city, and university city regions of Philadelphia. This suggests that block groups nearby tend to exhibit similar values, challenging the notion that these observations are spatially independent.
 
-```{r fig.height=6, fig.width=16}
+```{r echo=FALSE, fig.height=12, fig.width=16}
 mapgrid2 <- plot_grid( Plot1, 
                       Plot5,
                       align = c("hv","hv"),
@@ -473,7 +468,7 @@ mapgrid2
 
 From the map of the standardized regression residuals, there appear to be clusters of similar color. This suggests that there might be certain areas where the residuals are consistently high or low, which means the model might have systematically overestimated or underestimated the house values. In the map, given the clustering of similar colors in certain regions, there appears to be some degree of positive spatial autocorrelation in the residuals.
 
-```{r fig.height=6, fig.width=8}
+```{r echo=FALSE, fig.height=6, fig.width=8}
 data_geom <- data_geom %>%
   dplyr::mutate(predvals = fitted(lm1),
                 resids = residuals(lm1),
