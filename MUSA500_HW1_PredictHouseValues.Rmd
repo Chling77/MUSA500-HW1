@@ -2,14 +2,14 @@
 title: 'MUSA500 Homework 1: Using OLS Regression to Predict Median House Values in
   Philadelphia'
 author: "Ling Chen, Hang Zhao, Jiahang Li"
-date: "2023-10-16"
+date: "2023-10-19"
 output:
-  word_document:
-    toc: yes
   pdf_document:
     toc: yes
     latex_engine: xelatex
     pandoc_args: "--pdf-engine-opt=-shell-escape"
+  word_document:
+    toc: yes
 header-includes: \usepackage[utf8]{inputenc}
 ---
 
@@ -42,7 +42,7 @@ library(corrplot)
 options(scipen=999)
 
 data <- read.csv("https://raw.githubusercontent.com/Chling77/MUSA500-HW1/main/Data/RegressionData.csv")
-data_geom <-st_read("/Users/hangzhao/Documents/R/Lecture 1 - RegressionData.shp/RegressionData.shp")
+data_geom <-st_read("D:/00Penn-学习/MUSA500/HW 1/RegressionData_geom/RegressionData.shp")
 
 source("https://raw.githubusercontent.com/urbanSpatial/Public-Policy-Analytics-Landing/master/functions.r")
 
@@ -146,7 +146,7 @@ R^2 = 1-\frac{SSE}{SST}
 $$
 
 
-To assess our model, we examine the F-statistic and its corresponding p-value. The F-test, often referred to as the omnibus test, evaluates whether any of the independent variables in the model significantly predict the dependent variable. It tests the null hypothesis that none of the independent variables are significant predictors against the alternative hypothesis that at least one of them is. A model that fails to reject the null hypothesis is typically considered less effective. We then focus on the p-value associated with each independent variable. If the p-value for a specific independent variable is below 0.05, we can reject the null hypothesis, indicating that this particular predictor significantly influences the dependent variable. In this case, our null hypothesis, or H0 is that the coefficient $\beta$ equals zero, and the alternative  hypothesis, or Ha states that the coefficient $\beta$ does not equal zero, demonstrating as H0: $\beta$=0 and Ha: $\beta$≠0; 
+To assess our model, we examine the F-statistic and its corresponding p-value. The F-test, often referred to as the omnibus test, evaluates whether any of the independent variables in the model significantly predict the dependent variable. It tests the null hypothesis that none of the independent variables are significant predictors against the alternative hypothesis that at least one of them is. A model that fails to reject the null hypothesis is typically considered less effective. We then focus on the p-value associated with each independent variable. If the p-value for a specific independent variable is below 0.05, we can reject the null hypothesis, indicating that this particular predictor significantly influences the dependent variable. In this case, our null hypothesis, or H0 is that the coefficient $\beta$ equals zero, and the alternative  hypothesis, or Ha states that the coefficient $\beta$ does not equal zero, demonstrating as H0: $\beta$=0 and Ha: $\beta \neq 0$; 
 
 
 ## **Additional Analyses**
