@@ -4,13 +4,13 @@ title: 'MUSA500 Homework 1: Using OLS Regression to Predict Median House Values 
 author: "Ling Chen, Hang Zhao, Jiahang Li"
 date: "2023-10-16"
 output:
+  word_document:
+    toc: yes
   pdf_document:
     toc: yes
     latex_engine: xelatex
-    pandoc_args: ["--pdf-engine-opt=-shell-escape"]
-header-includes:
-  - "\\usepackage[utf8]{inputenc}"
-      
+    pandoc_args: "--pdf-engine-opt=-shell-escape"
+header-includes: \usepackage[utf8]{inputenc}
 ---
 
 ```{r setup, include=FALSE}
@@ -42,7 +42,7 @@ library(corrplot)
 options(scipen=999)
 
 data <- read.csv("https://raw.githubusercontent.com/Chling77/MUSA500-HW1/main/Data/RegressionData.csv")
-data_geom <-st_read("D:/00Penn-学习/MUSA500/HW 1/RegressionData_geom/RegressionData.shp")
+data_geom <-st_read("/Users/hangzhao/Documents/R/Lecture 1 - RegressionData.shp/RegressionData.shp")
 
 source("https://raw.githubusercontent.com/urbanSpatial/Public-Policy-Analytics-Landing/master/functions.r")
 
@@ -108,9 +108,9 @@ LNMEDHVAL = \beta_0 + \beta_1PCTVACANT\ + \beta_2PCTSINGLES + \beta_3PCTBACHMOR 
 $$
 
 
-Where β0 is the y-intercept, interpreting the value of the dependent variable when the predictors are 0; β1, β2, β3, β4 are the slope coefficients of the predictors. 
+Where $\beta_0$ is the y-intercept, interpreting the value of the dependent variable when the predictors are 0; $\beta_1$, $\beta_2$, $\beta_3$, $\beta_4$ are the slope coefficients of the predictors. 
 
-For a linear regression model, for any fixed value of independent variable x, there are parameters 𝛽0, 𝛽i, and 𝜎, where i = 1 in a simple regression and i>1 in a multiple regression, such that 𝑦 = 𝛽0 + 𝛽i𝑥i +𝜀, where 𝜀~𝑁(0, 𝜎2). The term 𝜀 is known as an error term or residual, and for each observation i, is defined as a vertical deviation (distance) between the observed value of y and the predicted value of y, denoted by ŷ. In addition, 𝜀~𝑁(0, 𝜎2) means that the error terms have a normal distribution with a mean of 0 and variance 𝜎2. This holds for any given value of x, the average error term will be 0, and a typical deviation from the regression line will be 𝜎 units. 
+For a linear regression model, for any fixed value of independent variable x, there are parameters $\beta_0$, $\beta_i$, and 𝜎, where i = 1 in a simple regression and i>1 in a multiple regression, such that y = $\beta_0$ + $\beta_i$xi +$\epsilon$, where $\epsilon$ ~ N(0, $\sigma^2$). The term $\epsilon$ is known as an error term or residual, and for each observation i, is defined as a vertical deviation (distance) between the observed value of y and the predicted value of y, denoted by ŷ. In addition, $\epsilon$~N(0, $\sigma^2$) means that the error terms have a normal distribution with a mean of 0 and variance $\sigma^2$. This holds for any given value of x, the average error term will be 0, and a typical deviation from the regression line will be $\sigma^2$ units. 
 
 There are several assumptions we have to make prior to the linear regression. 
 1. Check the linearity of each predictor and the dependent variable by creating scatter plots. If no linearity can be observed from the plots, variable transformation or polynomial regression might be better. 
@@ -119,34 +119,34 @@ There are several assumptions we have to make prior to the linear regression.
 4. Predictors should not be strongly correlated with each other, which is also called to prevent multicollinearity. 
 5. No fewer than 10 observations per predictor. 
 
-Given n observations on y, and k predictors x1 … xk, the estimates β0, β1, β2, …. βk are chosen simultaneously to minimize the expression for the Error Sum of Squares (SSE), given by:
+Given n observations on y, and k predictors x1 … xk, the estimates $\beta_0$, $\beta_1$, $\beta_2$, …. $\beta_k$ are chosen simultaneously to minimize the expression for the Error Sum of Squares (SSE), given by:
 
 $$
 SSE=\sum_{i = 1}^{n}{\epsilon^2}=\sum_{i = 1}^{n}{(y - \hat{y})^2}=\sum_{i = 1}^{n}{(y_i-\hat{\beta_0}-\hat{\beta_1}x_1i-\hat{\beta_2}x_2i-...-\hat{\beta_k}x_ki)^2}
 $$
 
-where ŷ is the predicted y of the model, which equals β0+β1x1+β2x2+.....+βkxk, with the minus sign before it would be demonstrated as the equation in the bracket. SSE represents the sum of squared error, or the sum of squared residuals ε, which is the amount of variability in y that is not explained when accounting for x in the model. There is another term SST, which means the total sum of squares, is demonstrated as the following equation: 
+where ŷ is the predicted y of the model, which equals $\beta_0$+$\beta_1$$x_1$+$\beta_2$$x_2$+.....+$\beta_k$$x_k$, with the minus sign before it would be demonstrated as the equation in the bracket. SSE represents the sum of squared error, or the sum of squared residuals $\epsilon$, which is the amount of variability in y that is not explained when accounting for x in the model. There is another term SST, which means the total sum of squares, is demonstrated as the following equation: 
 
 $$
 SST=\sum_{i = 1}^{n}{(y_i-\bar{y})^2}=\sum_{i = 1}^{n}{(y_i-\frac{\sum_{i = 1}^{n}{y_i}}{n})^2}
 $$
 
-where Ӯ here represents the overall mean of y values, therefore SST is interpreted as the squared deviation of that observation from the overall mean of y, and then summing those squared deviations across all observations i, without any regard to the value of x. 
+where $\bar{y}$ here represents the overall mean of y values, therefore SST is interpreted as the squared deviation of that observation from the overall mean of y, and then summing those squared deviations across all observations i, without any regard to the value of x. 
 
 $$
 \hat{\rho}=r=Corr(x,y)=\frac{\sum_{i = 1}^{n}{(x_i-\bar{x})(y_i-\bar{y})}}{\sqrt{\sum_{i = 1}^{n}{(x_i-\bar{x})^2}}{\sqrt{\sum_{i = 1}^{n}{(y_i-\bar{y})^2}}}}
 $$
 
-Sample correlation coefficient R is a point estimator of the population correlation 𝜌. 
+Sample correlation coefficient R is a point estimator of the population correlation $\rho$. 
 
-If we use the formula 1 – SSE/SST, we can get the coefficient of determination R2, which is the proportion of observed variation in the dependent variable y that was explained by the model. Also, it always ranges between 0 and 1. 
+If we use the formula 1 – SSE/SST, we can get the coefficient of determination $R^2$, which is the proportion of observed variation in the dependent variable y that was explained by the model. Also, it always ranges between 0 and 1. 
 
 $$
 R^2 = 1-\frac{SSE}{SST}
 $$
 
 
-To assess our model, we examine the F-statistic and its corresponding p-value. The F-test, often referred to as the omnibus test, evaluates whether any of the independent variables in the model significantly predict the dependent variable. It tests the null hypothesis that none of the independent variables are significant predictors against the alternative hypothesis that at least one of them is. A model that fails to reject the null hypothesis is typically considered less effective. We then focus on the p-value associated with each independent variable. If the p-value for a specific independent variable is below 0.05, we can reject the null hypothesis, indicating that this particular predictor significantly influences the dependent variable. In this case, our null hypothesis, or H0 is that the coefficient β equals zero, and the alternative  hypothesis, or Ha states that the coefficient β does not equal zero, demonstrating as H0: β=0 and Ha: β≠0; 
+To assess our model, we examine the F-statistic and its corresponding p-value. The F-test, often referred to as the omnibus test, evaluates whether any of the independent variables in the model significantly predict the dependent variable. It tests the null hypothesis that none of the independent variables are significant predictors against the alternative hypothesis that at least one of them is. A model that fails to reject the null hypothesis is typically considered less effective. We then focus on the p-value associated with each independent variable. If the p-value for a specific independent variable is below 0.05, we can reject the null hypothesis, indicating that this particular predictor significantly influences the dependent variable. In this case, our null hypothesis, or H0 is that the coefficient $\beta$ equals zero, and the alternative  hypothesis, or Ha states that the coefficient $\beta$ does not equal zero, demonstrating as H0: $\beta$=0 and Ha: $\beta$≠0; 
 
 
 ## **Additional Analyses**
